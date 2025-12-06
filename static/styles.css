@@ -1,0 +1,262 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    background: #f0f0f0;
+    height: 100vh;
+}
+
+.iframe-container {
+    position: absolute;
+    border: 2px solid #333;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.iframe-container.active {
+    border-color: #007acc;
+    box-shadow: 0 6px 12px rgba(0, 122, 204, 0.3);
+    z-index: 1000;
+}
+
+.iframe-header {
+    height: 30px;
+    background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+    border-bottom: 1px solid #999;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #333;
+    user-select: none;
+}
+
+.iframe-container.active .iframe-header {
+    background: linear-gradient(to bottom, #007acc, #005a9e);
+    color: white;
+}
+
+iframe {
+    width: 100%;
+    height: calc(100% - 30px);
+    border: none;
+    pointer-events: auto;
+    cursor: default;
+}
+
+.resize-handle {
+    position: absolute;
+    background: transparent;
+}
+
+.resize-handle.corner {
+    width: 15px;
+    height: 15px;
+}
+
+.resize-handle.edge {
+    background: transparent;
+}
+
+/* Corners */
+.resize-handle.se {
+    bottom: 0;
+    right: 0;
+    cursor: nwse-resize;
+}
+
+.resize-handle.sw {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.resize-handle.ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.resize-handle.nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+/* Edges */
+.resize-handle.n {
+    top: 0;
+    left: 15px;
+    right: 15px;
+    height: 5px;
+    cursor: ns-resize;
+}
+
+.resize-handle.s {
+    bottom: 0;
+    left: 15px;
+    right: 15px;
+    height: 5px;
+    cursor: ns-resize;
+}
+
+.resize-handle.e {
+    right: 0;
+    top: 15px;
+    bottom: 15px;
+    width: 5px;
+    cursor: ew-resize;
+}
+
+.resize-handle.w {
+    left: 0;
+    top: 15px;
+    bottom: 15px;
+    width: 5px;
+    cursor: ew-resize;
+}
+
+.iframe-overlay {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: none;
+    z-index: 10;
+}
+
+.iframe-overlay.active {
+    display: block;
+}
+
+.reset-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    background: #007acc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    user-select: none;
+}
+
+.reset-button:hover {
+    background: #005a9e;
+}
+
+.reset-button:active {
+    background: #004578;
+}
+
+.help-icon {
+    position: fixed;
+    top: 10px;
+    right: 150px;
+    width: 40px;
+    height: 40px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: help;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.help-icon:hover {
+    background: #45a049;
+}
+
+.help-tooltip {
+    position: fixed;
+    top: 60px;
+    right: 150px;
+    background: white;
+    color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    width: 320px;
+    display: none;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.help-icon:hover+.help-tooltip,
+.help-tooltip:hover {
+    display: block;
+}
+
+.help-tooltip h3 {
+    margin: 0 0 10px 0;
+    color: #007acc;
+    font-size: 16px;
+}
+
+.help-tooltip ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.help-tooltip li {
+    margin: 5px 0;
+}
+
+.help-tooltip strong {
+    color: #007acc;
+}
+
+/* Block navigation bar area */
+.nav-blocker-top {
+    position: absolute;
+    top: 30px;
+    left: 5px;
+    right: 5px;
+    height: 50px;
+    background: transparent;
+    z-index: 5;
+    pointer-events: auto;
+}
+
+.nav-blocker-bottom {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    height: 50px;
+    background: transparent;
+    z-index: 5;
+    pointer-events: auto;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 12px;
+}

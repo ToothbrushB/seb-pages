@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desmos Side By Side</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <button class="reset-button" onclick="resetView()">Reset View</button>
+    
+    <div class="help-icon">?</div>
+    <div class="help-tooltip">
+        <h3>📖 Instructions</h3>
+        <ul>
+            <li><strong>Move:</strong> Click and drag the header bar</li>
+            <li><strong>Resize:</strong> Drag from any edge or corner</li>
+            <li><strong>Maximize:</strong> Double-click the header bar. Double-click again to restore.</li>
+            <li><strong>Bring to Front:</strong> Click on the header bar</li>
+            <li><strong>Reset View:</strong> Click the "Reset View" button</li>
+        </ul>
+        <p style="margin-top: 10px; font-style: italic; color: #666;">
+            Navigation is disabled for exam mode. Use of Safe Exam Browser is required.
+        </p>
+    </div>
+    
+    <div id="container1" class="iframe-container" style="left: 50px; top: 50px; width: 645px; height: 1000px;">
+        <div class="iframe-header">Graphing</div>
+        <iframe src="https://www.desmos.com/testing/cb-sat-ap/graphing" sandbox="allow-scripts allow-forms"></iframe>
+        <div class="iframe-overlay"></div>
+        <div class="resize-handle corner nw"></div>
+        <div class="resize-handle corner ne"></div>
+        <div class="resize-handle corner sw"></div>
+        <div class="resize-handle corner se"></div>
+        <div class="resize-handle edge n"></div>
+        <div class="resize-handle edge s"></div>
+        <div class="resize-handle edge e"></div>
+        <div class="resize-handle edge w"></div>
+    </div>
+
+    <div id="container2" class="iframe-container" style="left: 700px; top: 50px; width: 645px; height: 688px;">
+        <div class="iframe-header">Matrix</div>
+        <iframe src="https://www.desmos.com/matrix" sandbox="allow-scripts allow-forms"></iframe>
+        <div class="nav-blocker-top"></div>
+        <div class="nav-blocker-bottom"></div>
+        <div class="iframe-overlay"></div>
+        <div class="resize-handle corner nw"></div>
+        <div class="resize-handle corner ne"></div>
+        <div class="resize-handle corner sw"></div>
+        <div class="resize-handle corner se"></div>
+        <div class="resize-handle edge n"></div>
+        <div class="resize-handle edge s"></div>
+        <div class="resize-handle edge e"></div>
+        <div class="resize-handle edge w"></div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <p>© Caleb Li 2025. No Rights Reserved. Not affiliated with Desmos.</p>
+        </div>
+    </footer>
+
+    <script>
+        let activeContainer = null;
+        let isDragging = false;
+        let isResizing = false;
+        let resizeDirection = null;
+        let startX, startY, startLeft, startTop, startWidth, startHeight;
+        let zIndexCounter = 1000; // Track z-index for stacking order
+        
+        // Store original dimensions for maximize/restore
+        const savedDimensions = new Map();
+
+        const containers = document.querySelectorAll('.iframe-container');
+
+
+
+        containers.forEach(container => {
+            const header = container.querySelector('.iframe-header');
+            const resizeHandles = container.querySelectorAll('.resize-handle');
+            const overlay = container.querySelector('.iframe-overlay');
+
+            // Make container active on click
+            container.addEventListener('mousedown', (e) => {
+                // Remove active class from previous container
+                if (activeContainer && activeContainer !== container) {
+                    activeContainer.classList.remove('active');
+                }
+                
+                // Add active class to clicked container
+                container.classList.add('active');
+                activeContainer = container;
+                
+                // Bring clicked container to front
+                zIndexCounter++;
+                container.style.zIndex = zIndexCounter;
+            });
+
+            // Double-click to maximize/restore
+            header.addEventListener('dblclick', (e) => {
+                const containerId = container.id;
+                
+                if (savedDimensions.has(containerId)) {
+                    // Restore to saved dimensions
+                    const saved = savedDimensions.get(containerId);
+                    container.style.left = saved.left;
+                    container.style.top = saved.top;
+                    container.style.width = saved.width;
+                    container.style.height = saved.height;
+                    savedDimensions.delete(containerId);
+                } else {
+                    // Save current dimensions
+                    savedDimensions.set(containerId, {
+                        left: container.style.left,
+                        top: container.style.top,
+                        width: container.style.width,
+                        height: container.style.height
+                    });
+                    
+                    // Maximize to full screen
+                    container.style.left = '0px';
+                    container.style.top = '0px';
+                    container.style.width = window.innerWidth + 'px';
+                    container.style.height = window.innerHeight + 'px';
+                }
+                
+                // Update bottom blocker visibility
+                updateBottomBlocker(container);
+                e.preventDefault();
+            });
+
+            // Dragging functionality
+            header.addEventListener('mousedown', (e) => {
+                if (e.target === header) {
+                    isDragging = true;
+                    overlay.classList.add('active');
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startLeft = container.offsetLeft;
+                    startTop = container.offsetTop;
+                    e.preventDefault();
+                }
+            });
+
+            // Resizing functionality
+            resizeHandles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    overlay.classList.add('active');
+                    resizeDirection = handle.className.split(' ').filter(c => c !== 'resize-handle' && c !== 'corner' && c !== 'edge')[0];
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startLeft = container.offsetLeft;
+                    startTop = container.offsetTop;
+                    startWidth = container.offsetWidth;
+                    startHeight = container.offsetHeight;
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+        });
+
+        // Global mouse move handler
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && activeContainer) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                activeContainer.style.left = (startLeft + dx) + 'px';
+                activeContainer.style.top = (startTop + dy) + 'px';
+            } else if (isResizing && activeContainer) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                let newLeft = startLeft;
+                let newTop = startTop;
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+
+                // Handle horizontal resizing
+                if (resizeDirection.includes('e')) {
+                    newWidth = Math.max(645, startWidth + dx);
+                } else if (resizeDirection.includes('w')) {
+                    newWidth = Math.max(645, startWidth - dx);
+                    newLeft = startLeft + (startWidth - newWidth);
+                }
+
+                // Handle vertical resizing
+                if (resizeDirection.includes('s')) {
+                    newHeight = Math.max(688, startHeight + dy);
+                } else if (resizeDirection.includes('n')) {
+                    newHeight = Math.max(688, startHeight - dy);
+                    newTop = startTop + (startHeight - newHeight);
+                }
+
+                activeContainer.style.left = newLeft + 'px';
+                activeContainer.style.top = newTop + 'px';
+                activeContainer.style.width = newWidth + 'px';
+                activeContainer.style.height = newHeight + 'px';
+            }
+        });
+
+        // Global mouse up handler
+        document.addEventListener('mouseup', () => {
+            if (isDragging || isResizing) {
+                isDragging = false;
+                isResizing = false;
+                resizeDirection = null;
+                
+                // Remove overlay from all containers
+                document.querySelectorAll('.iframe-overlay').forEach(overlay => {
+                    overlay.classList.remove('active');
+                });
+            }
+        });
+
+        // Prevent text selection while dragging
+        document.addEventListener('selectstart', (e) => {
+            if (isDragging || isResizing) {
+                e.preventDefault();
+            }
+        });
+
+        // Reset view function
+        function resetView() {
+            const container1 = document.getElementById('container1');
+            const container2 = document.getElementById('container2');
+            
+            // Reset container 1
+            container1.style.left = '50px';
+            container1.style.top = '50px';
+            container1.style.width = '645px';
+            container1.style.height = '1000px';
+            
+            // Reset container 2
+            container2.style.left = '700px';
+            container2.style.top = '50px';
+            container2.style.width = '645px';
+            container2.style.height = '688px';
+        
+        }
+    </script>
+</body>
+</html>
