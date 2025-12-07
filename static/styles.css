@@ -284,3 +284,27 @@ nav ul {
     gap: 15px;
     margin: 20px;
 }
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10000;
+}
+
+.warning {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+}
+
+.d-none {
+    display: none;
+}
+
+.d-block {
+    display: block;
+}
