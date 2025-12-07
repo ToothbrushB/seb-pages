@@ -309,3 +309,10 @@ footer {
         box-shadow: 0 0 40px rgba(255, 0, 0, 1);
     }
 }
+
+/* Security Information */
+#security-information li {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}

@@ -1,5 +1,11 @@
 function getSEBSecurityInfo() {
-    SafeExamBrowser.security.updateKeys(didUpdateSEBSecurityInfo);
+    try {
+        SafeExamBrowser.security.updateKeys(didUpdateSEBSecurityInfo);
+    } catch (error) {
+        document.getElementById("header-content").innerHTML = "SEB Security information could not be retrieved!";
+        document.getElementById("header-content").classList.remove("d-none");
+        document.getElementById("header-content").classList.add("d-block");
+    }
 }
 
 async function concatHash(a, b) {
@@ -44,7 +50,7 @@ function didUpdateSEBSecurityInfo() {
         }
         document.getElementById("seb-ck").innerText = "Config Key (hashed with URL): " + ckActual;
         document.getElementById("seb-bek").innerText = "Browser Exam Key (hashed with URL): " + bekActual;
-        document.getElementById("seb-ua").innerText = "User Agent: " + userAgent;
+        document.getElementById("seb-ua").innerText = "User Agent (hashed with URL): " + hashedUA;
         document.getElementById("seb-version").innerText = "Application version: " + sebClientVersion;
     });
     
