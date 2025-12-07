@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEB Pages</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="static/styles.css">
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.html">
                 <h1 class="mb-0">SEB Pages</h1>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -24,30 +28,71 @@
                     <li class="nav-item">
                         <a class="nav-link" href="DesmosMatrixGraphing.html">Desmos Matrix & CB Graphing</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="HashGenerator.html">Hash Generator</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
-    
+
     <main class="flex-grow-1">
         <div class="container py-5">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     <h2 class="mb-4">Welcome to SEB Pages</h2>
                     <p class="lead">This website hosts pages created by Caleb Li for use with Safe Exam Browser.</p>
-                    <p>Explore the Desmos Matrix & CB Graphing tool by clicking the link in the navigation menu above.</p>
+                    <p>Explore the Desmos Matrix & CB Graphing tool by clicking the link in the navigation menu above.
+                    </p>
                     <div class="mt-4">
                         <a href="DesmosMatrixGraphing.html" class="btn btn-primary btn-lg">Go to Graphing Tool</a>
                     </div>
+                    <h3>Using Safe Exam Browser (SEB)</h3>
+                    <p>Safe Exam Browser (SEB) is a secure web browser environment designed for online exams. It
+                        restricts access to unauthorized resources and ensures a safe testing environment. It also
+                        helpful to provide a controlled way to provide students access to tools like Desmos, Geogebra,
+                        or Wolfram Alpha in a secure environment.</p>
+                    <p>For more information about SEB, visit the <a href="https://safeexambrowser.org/" target="_blank"
+                            rel="noopener noreferrer">official SEB website</a>.</p>
+                    <h3>What makes SEB safe?</h3>
+                    <ul>
+                        <li>Restricts access to other applications and websites during an exam.</li>
+                        <li>Prevents copying, pasting, and screen capturing.</li>
+                        <li>Allows configuration of permitted resources and tools.</li>
+                        <li>Supports integration with various learning management systems (LMS).</li>
+                    </ul>
+                    <h3>SEB Compatibility</h3>
+                    <p>This website is optimized for use within Safe Exam Browser to ensure the best experience during
+                        exams, including verification of user agent, BEK, and CK. If any verification checks fail, a
+                        warning message will be displayed to the user. Please ensure you are using the latest version of
+                        SEB for optimal performance and security.</p>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <img src="static/seb_logo.png" alt="SEB Logo" class="img-fluid rounded">
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto mt-5">
+                        <h2>Suggested Configuration</h2>
+                        <ul>
+                            <li>Set the launch URL to <code>DesmosMatrixGraphing.html</code> to directly access the
+                                Desmos Matrix & CB Graphing tool within Safe Exam Browser.</li>
+                            <li>The exam password should be written on the physical exam paper or provided securely by the instructor.</li>
+                            <li>The quit password should be kept confidential and only shared with authorized personnel.</li>
+                            <li>The quit password may also be posted on the exam room door or another secure location for students to access after testing.</li>
+                            <li>The exam password and quit password should be changed every exam session to maintain security.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
     </main>
-    
+
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         <p class="mb-0">© Caleb Li 2025. No Rights Reserved. Not affiliated with Desmos.</p>
     </footer>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>

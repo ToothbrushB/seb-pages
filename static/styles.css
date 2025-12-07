@@ -6,13 +6,6 @@
     box-sizing: border-box;
 }
 
-body {
-    overflow: hidden;
-    background: #f8f9fa;
-    height: 100vh;
-    border: 8px solid transparent;
-}
-
 body.danger-active {
     border: 8px solid #ff0000;
     animation: danger-flash 0.5s infinite;
@@ -267,7 +260,7 @@ iframe {
 }
 
 /* Footer */
-footer {
+.fixed-footer {
     position: fixed;
     bottom: 0;
     width: 100%;

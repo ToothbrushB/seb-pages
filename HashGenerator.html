@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEB Hash Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <style>
+        .hash-input-group {
+            margin-bottom: 1.5rem;
+        }
+        .hash-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        .copy-button {
+            cursor: pointer;
+        }
+        .hash-card {
+            border-left: 4px solid #0d6efd;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+        html, body {
+            height: auto;
+            overflow: auto !important;
+        }
+        body {
+            border: none !important;
+        }
+        main {
+            padding-top: 1rem;
+            min-height: calc(100vh - 200px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <h1 class="mb-0">SEB Hash Generator</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="DesmosMatrixGraphing.html">Desmos Matrix & CB Graphing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="HashGenerator.html">Hash Generator</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title mb-4">SHA256 Hash Generator for SEB</h2>
+                            <p class="text-muted">Enter your values below to generate SHA256 hashes for Safe Exam Browser configuration.</p>
+                            
+                            <!-- BEK Input -->
+                            <div class="hash-input-group">
+                                <label for="bekInput" class="form-label fw-bold">Browser Exam Key (BEK)</label>
+                                <textarea class="form-control" id="bekInput" rows="3" placeholder="Enter your BEK value here"></textarea>
+                                <small class="text-muted">Your browser exam key</small>
+                            </div>
+
+                            <!-- CK Input -->
+                            <div class="hash-input-group">
+                                <label for="ckInput" class="form-label fw-bold">Config Key (CK)</label>
+                                <textarea class="form-control" id="ckInput" rows="3" placeholder="Enter your CK value here"></textarea>
+                                <small class="text-muted">Your config key</small>
+                            </div>
+
+                            <!-- UA Input -->
+                            <div class="hash-input-group">
+                                <label for="uaInput" class="form-label fw-bold">User Agent (UA)</label>
+                                <textarea class="form-control" id="uaInput" rows="3" placeholder="Enter your UA value here"></textarea>
+                                <small class="text-muted">Your user agent string</small>
+                            </div>
+
+                            <!-- URL Input -->
+                            <div class="hash-input-group">
+                                <label for="urlInput" class="form-label fw-bold">URL</label>
+                                <input type="text" class="form-control" id="urlInput" placeholder="Enter the URL here">
+                                <small class="text-muted">The exam URL</small>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                                <button class="btn btn-primary btn-lg" onclick="generateHashes()">Generate Hashes</button>
+                                <button class="btn btn-secondary btn-lg" onclick="clearAll()">Clear All</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Section -->
+                    <div id="outputSection" style="display: none;">
+                        <h3 class="mb-4">Generated Hashes</h3>
+                        
+                        <!-- BEK Hash Output -->
+                        <div class="card hash-card shadow-sm mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title">BEK Hash (SHA256)</h5>
+                                        <div class="hash-output" id="bekHashOutput"></div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary ms-3 copy-button" onclick="copyToClipboard('bekHashOutput', event)">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CK Hash Output -->
+                        <div class="card hash-card shadow-sm mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title">CK Hash (SHA256)</h5>
+                                        <div class="hash-output" id="ckHashOutput"></div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary ms-3 copy-button" onclick="copyToClipboard('ckHashOutput', event)">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UA Hash Output -->
+                        <div class="card hash-card shadow-sm mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title">UA Hash (SHA256)</h5>
+                                        <div class="hash-output" id="uaHashOutput"></div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary ms-3 copy-button" onclick="copyToClipboard('uaHashOutput', event)">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">© Caleb Li 2025. No Rights Reserved. Not affiliated with Desmos.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <script>
+        function generateHashes() {
+            const bek = document.getElementById('bekInput').value;
+            const ck = document.getElementById('ckInput').value;
+            const ua = document.getElementById('uaInput').value;
+            const url = document.getElementById('urlInput').value;
+
+            // Validate that at least BEK and CK are provided
+            if (!url.trim()) {
+                alert('Please enter the URL value');
+                return;
+            }
+
+            // Generate SHA256 hashes
+            const bekHash = bek.trim() ? CryptoJS.SHA256(url+bek).toString() : '';
+            const ckHash = ck.trim() ? CryptoJS.SHA256(url+ck).toString() : '';
+            const uaHash = ua.trim() ? CryptoJS.SHA256(url+ua).toString() : '';
+
+            // Display results
+            document.getElementById('bekHashOutput').textContent = bekHash || '(Empty - not hashed)';
+            document.getElementById('ckHashOutput').textContent = ckHash || '(Empty - not hashed)';
+            document.getElementById('uaHashOutput').textContent = uaHash || '(Empty - not hashed)';
+
+            // Show output section
+            document.getElementById('outputSection').style.display = 'block';
+        }
+
+        function copyToClipboard(elementId, event) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+
+            if (text.includes('(Empty - not hashed)')) {
+                alert('Nothing to copy - this value was empty');
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                // Show feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy to clipboard');
+                console.error('Error copying to clipboard:', err);
+            });
+        }
+
+        function clearAll() {
+            document.getElementById('bekInput').value = '';
+            document.getElementById('ckInput').value = '';
+            document.getElementById('uaInput').value = '';
+            document.getElementById('urlInput').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+        }
+
+        // Allow Enter key to generate hashes
+        document.getElementById('bekInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') generateHashes();
+        });
+        document.getElementById('ckInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') generateHashes();
+        });
+        document.getElementById('uaInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') generateHashes();
+        });
+    </script>
+</body>
+</html>
