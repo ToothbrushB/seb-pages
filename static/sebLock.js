@@ -12,16 +12,19 @@ async function concatHash(a, b) {
 
 function didUpdateSEBSecurityInfo() {
     // while a user may reasonably be able to inject the correct keys into JS variables, they cannot easily guess the user agent string to identify a real SEB instance
-    const userAgent = window.navigator.userAgent;
+    // extract substring from UA string between [ and ] if present
+    const userAgentFull = window.navigator.userAgent;
+    const userAgentMatch = userAgentFull.match(/\[(.*?)\]/);
+    const userAgent = userAgentMatch ? userAgentMatch[1] : userAgentFull;
     const bekExpected = document.querySelector('meta[name="seb-bek"]').content;
     const ckExpected = document.querySelector('meta[name="seb-ck"]').content;
     const uaHashedExpected = document.querySelector('meta[name="seb-ua"]').content;
     const url = window.location.origin + window.location.pathname; // Use origin and pathname to exclude query parameters and fragments
     // concatenate URL with each expected key and hash them with SHA 256, output as hex string
     Promise.all([
-        concatHash(ckExpected, url),
-        concatHash(bekExpected, url),
-        concatHash(userAgent, url)
+        concatHash(url, ckExpected),
+        concatHash(url, bekExpected),
+        concatHash(url, userAgent)
     ]).then(hashedKeys => {
         const [hashedCK, hashedBEK, hashedUA] = hashedKeys;
         var ckActual = SafeExamBrowser.security.configKey;
@@ -41,7 +44,7 @@ function didUpdateSEBSecurityInfo() {
         }
         document.getElementById("seb-ck").innerText = "Config Key (hashed with URL): " + ckActual;
         document.getElementById("seb-bek").innerText = "Browser Exam Key (hashed with URL): " + bekActual;
-        document.getElementById("seb-ua").innerText = "User Agent (hashed with URL): " + userAgent;
+        document.getElementById("seb-ua").innerText = "User Agent: " + userAgent;
         document.getElementById("seb-version").innerText = "Application version: " + sebClientVersion;
     });
     
