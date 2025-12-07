@@ -1,0 +1,44 @@
+{
+  "desmos-graphing": {
+    "name": "Desmos Graphing Calculator",
+    "url": "https://www.desmos.com/testing/cb-sat-ap/graphing",
+    "icon": "bi-graph-up",
+    "description": "College Board SAT/AP Graphing Calculator"
+  },
+  "desmos-scientific": {
+    "name": "Desmos Scientific Calculator",
+    "url": "https://www.desmos.com/scientific",
+    "icon": "bi-calculator",
+    "description": "Scientific calculator with standard functions"
+  },
+  "desmos-matrix": {
+    "name": "Desmos Matrix Calculator",
+    "url": "https://www.desmos.com/matrix",
+    "icon": "bi-table",
+    "description": "Matrix operations and calculations"
+  },
+  "geogebra": {
+    "name": "GeoGebra Calculator",
+    "url": "https://www.geogebra.org/calculator",
+    "icon": "bi-compass",
+    "description": "Interactive geometry, algebra, and calculus"
+  },
+  "wolfram-alpha": {
+    "name": "Wolfram Alpha",
+    "url": "https://www.wolframalpha.com/",
+    "icon": "bi-mortarboard",
+    "description": "Computational knowledge engine"
+  },
+  "google-docs": {
+    "name": "Google Docs",
+    "url": "https://docs.google.com/",
+    "icon": "bi-file-text",
+    "description": "Online document editor"
+  },
+  "google-sheets": {
+    "name": "Google Sheets",
+    "url": "https://sheets.google.com/",
+    "icon": "bi-file-spreadsheet",
+    "description": "Online spreadsheet editor"
+  }
+}

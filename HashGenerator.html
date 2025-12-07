@@ -79,20 +79,6 @@
                         <div class="card-body">
                             <h2 class="card-title mb-4">SHA256 Hash Generator for SEB</h2>
                             <p class="text-muted">Enter your values below to generate SHA256 hashes for Safe Exam Browser configuration.</p>
-                            
-                            <!-- BEK Input -->
-                            <div class="hash-input-group">
-                                <label for="bekInput" class="form-label fw-bold">Browser Exam Key (BEK)</label>
-                                <textarea class="form-control" id="bekInput" rows="3" placeholder="Enter your BEK value here"></textarea>
-                                <small class="text-muted">Your browser exam key</small>
-                            </div>
-
-                            <!-- CK Input -->
-                            <div class="hash-input-group">
-                                <label for="ckInput" class="form-label fw-bold">Config Key (CK)</label>
-                                <textarea class="form-control" id="ckInput" rows="3" placeholder="Enter your CK value here"></textarea>
-                                <small class="text-muted">Your config key</small>
-                            </div>
 
                             <!-- UA Input -->
                             <div class="hash-input-group">
@@ -118,32 +104,6 @@
                     <!-- Output Section -->
                     <div id="outputSection" style="display: none;">
                         <h3 class="mb-4">Generated Hashes</h3>
-                        
-                        <!-- BEK Hash Output -->
-                        <div class="card hash-card shadow-sm mb-3">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <h5 class="card-title">BEK Hash (SHA256)</h5>
-                                        <div class="hash-output" id="bekHashOutput"></div>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary ms-3 copy-button" onclick="copyToClipboard('bekHashOutput', event)">Copy</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CK Hash Output -->
-                        <div class="card hash-card shadow-sm mb-3">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <h5 class="card-title">CK Hash (SHA256)</h5>
-                                        <div class="hash-output" id="ckHashOutput"></div>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary ms-3 copy-button" onclick="copyToClipboard('ckHashOutput', event)">Copy</button>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- UA Hash Output -->
                         <div class="card hash-card shadow-sm mb-3">
@@ -171,8 +131,6 @@
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
     <script>
         function generateHashes() {
-            const bek = document.getElementById('bekInput').value;
-            const ck = document.getElementById('ckInput').value;
             const ua = document.getElementById('uaInput').value;
             const url = document.getElementById('urlInput').value;
 
@@ -183,13 +141,9 @@
             }
 
             // Generate SHA256 hashes
-            const bekHash = bek.trim() ? CryptoJS.SHA256(url+bek).toString() : '';
-            const ckHash = ck.trim() ? CryptoJS.SHA256(url+ck).toString() : '';
             const uaHash = ua.trim() ? CryptoJS.SHA256(url+ua).toString() : '';
 
             // Display results
-            document.getElementById('bekHashOutput').textContent = bekHash || '(Empty - not hashed)';
-            document.getElementById('ckHashOutput').textContent = ckHash || '(Empty - not hashed)';
             document.getElementById('uaHashOutput').textContent = uaHash || '(Empty - not hashed)';
 
             // Show output section
@@ -220,20 +174,11 @@
         }
 
         function clearAll() {
-            document.getElementById('bekInput').value = '';
-            document.getElementById('ckInput').value = '';
             document.getElementById('uaInput').value = '';
             document.getElementById('urlInput').value = '';
             document.getElementById('outputSection').style.display = 'none';
         }
 
-        // Allow Enter key to generate hashes
-        document.getElementById('bekInput').addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') generateHashes();
-        });
-        document.getElementById('ckInput').addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') generateHashes();
-        });
         document.getElementById('uaInput').addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') generateHashes();
         });

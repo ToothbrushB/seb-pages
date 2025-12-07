@@ -1,0 +1,25 @@
+{
+  "a1b2c3d4-e5f6-7890-abcd-ef1234567890": {
+    "exam_key": "ALPHA-BRAVO-CHARLIE-DELTA",
+    "custom_name": "Sample Math Exam",
+    "bek": "abc123def456",
+    "ck": "xyz789uvw012",
+    "ua": "mno345pqr678",
+    "apps": [
+      "desmos-graphing",
+      "desmos-scientific",
+      "desmos-matrix"
+    ]
+  },
+  "e609920d-2ea9-44e9-b88e-a551ff51b240": {
+    "exam_key": "BRONZE-PRISM-PRISM-INFERNO",
+    "custom_name": "Yoikes",
+    "bek": "2894cd3a7e60322ffba81511a440f59aaef7e9a99d3099dcec8a141cd3b2db88",
+    "ck": "7912dcbbc5096e22b0d53c156d130abeab8c6b92de34e89e2968fb6c9ac28b26",
+    "ua": "727d962c7c591db062450d2a23f16698ff9c9bea81788b2cd45949e58b64c28c",
+    "apps": [
+      "desmos-graphing",
+      "desmos-matrix"
+    ]
+  }
+}

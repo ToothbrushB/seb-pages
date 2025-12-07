@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/appstyle.css">
+    <meta name="seb-bek" content="{{ seb['bek'] }}">
+    <meta name="seb-ck" content="{{ seb['ck'] }}">
+    <meta name="seb-ua" content="{{ seb['ua'] }}">
+    <script src="/static/SEBlock.js"></script>
+</head>
+
+<body class="danger-active">
+    <header id="mainHeader" class="top-header">
+        <div id="header-content" class="d-flex align-items-center justify-content-between">
+            <div id="seb-check" class="alert alert-danger bad">JavaScript is required to view this content.</div>
+            <div id="exam-key">
+                {{ exam_key }}{% if app_name %} - {{ app_name }}{% endif %}
+            </div>
+            <div>
+                <div class="help-icon">?</div>
+                <div class="help-tooltip">
+                    <h3>📖 Instructions</h3>
+                    <ul>
+                        <li>This tool is secured by Safe Exam Browser.</li>
+                        <li><strong>Reset View:</strong> Click the "Reset View" button to reload the content.</li>
+                    </ul>
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">
+                        🔒 Use of Safe Exam Browser is required.
+                    </p>
+                    <div id="security-information">
+                        <ul>
+                            <li id="seb-ck">SEB Not Detected</li>
+                            <li id="seb-bek">SEB Not Detected</li>
+                            <li id="seb-ua">SEB Not Detected</li>
+                            <li id="seb-version">SEB Not Detected</li>
+                        </ul>
+                    </div>
+                    <div id="copyright-info">
+                        © Caleb Li 2025. No Rights Reserved.
+                    </div>
+                </div>
+            </div>
+            <button id="reset-view" class="btn btn-sm btn-secondary">Reset View</button>
+        </div>
+    </header>
+    <main id="mainContent" style="position:absolute; top:0; left:0; right:0; bottom:30px; width:100vw;">
+        <iframe id="mainIframe" src="{{ iframe_url }}" sandbox="allow-scripts allow-forms"
+            style="width:100%; height:100%; border:none;"></iframe>
+    </main>
+    <script>
+        const header = document.getElementById('mainHeader');
+        const mainContent = document.getElementById('mainContent');
+        const mainIframe = document.getElementById('mainIframe');
+
+        function getHeaderHeight() {
+            return header.offsetHeight;
+        }
+
+        function resizeMainArea() {
+            const headerHeight = getHeaderHeight();
+            mainContent.style.top = headerHeight + 'px';
+            mainIframe.style.height = '100%';
+        }
+        window.addEventListener('resize', resizeMainArea);
+        // Initial sizing
+        resizeMainArea();
+        // Reset View button functionality
+        document.getElementById('reset-view').addEventListener('click', () => {
+            mainIframe.src = mainIframe.src;
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
