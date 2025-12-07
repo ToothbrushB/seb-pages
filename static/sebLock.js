@@ -31,11 +31,13 @@ function didUpdateSEBSecurityInfo() {
             document.getElementById("header-content").innerHTML = "Security check failed: User Agent string does not match SEB instance.";
             document.getElementById("header-content").classList.remove("d-none");
             document.getElementById("header-content").classList.add("d-block");
-        }
-        if (hashedCK !== ckActual || hashedBEK !== bekActual) {
+        } else if (hashedCK !== ckActual || hashedBEK !== bekActual) {
             document.getElementById("header-content").innerHTML = "Security check failed: Config Key or Browser Exam Key does not match expected values.";
             document.getElementById("header-content").classList.remove("d-none");
             document.getElementById("header-content").classList.add("d-block");
+        } else {
+            document.getElementById("header-content").classList.remove("d-block");
+            document.getElementById("header-content").classList.add("d-none");
         }
         document.getElementById("seb-ck").innerText = "Config Key (hashed with URL): " + ckActual;
         document.getElementById("seb-bek").innerText = "Browser Exam Key (hashed with URL): " + bekActual;

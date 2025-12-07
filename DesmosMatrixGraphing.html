@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Desmos Side By Side</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="static/styles.css">
     <meta name="seb-bek" content="dce5126358f122e9abaacc26c80cdcb34673703462ec2b59d90b04c9c8ec65c4">
     <meta name="seb-ck" content="9cb3543e7f84c76e2d566ae8b2119d086ea39a560972818ce0f82a953e21c6bb">
-    <meta name="seb-ua" content="">
+    <meta name="seb-ua" content="2bd0c026bb8ff538dd2c409f2b7af2d8dc741cb170213e264f0c0030dcd4a3b4">
     <script src="static/sebLock.js"></script>
 </head>
 <body>
-    <header>
-        <div id="header-content" class="warning d-none">YIKES</div>
+    <header class="fixed-top-header">
+        <div id="header-content" class="alert alert-danger mb-0 d-none">YIKES</div>
     </header>
-    <button class="reset-button" onclick="resetView()">Reset View</button>
+    <button class="reset-button btn btn-primary" onclick="resetView()">Reset View</button>
     
     <div class="help-icon">?</div>
     <div class="help-tooltip">
@@ -74,6 +75,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
         let activeContainer = null;
         let isDragging = false;
@@ -252,6 +254,26 @@
             container2.style.height = '688px';
         
         }
+
+        // Monitor header visibility to control flashing border
+        function updateDangerBorder() {
+            const headerContent = document.getElementById('header-content');
+            const body = document.body;
+            
+            if (headerContent.classList.contains('d-block')) {
+                body.classList.add('danger-active');
+            } else {
+                body.classList.remove('danger-active');
+            }
+        }
+
+        // Initial check
+        updateDangerBorder();
+        
+        // Watch for changes to header visibility
+        const headerContent = document.getElementById('header-content');
+        const observer = new MutationObserver(updateDangerBorder);
+        observer.observe(headerContent, { attributes: true, attributeFilter: ['class'] });
     </script>
 </body>
 </html>

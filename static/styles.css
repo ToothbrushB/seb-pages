@@ -1,3 +1,5 @@
+/* Bootstrap Enhancements and Custom Styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -5,40 +7,58 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
     overflow: hidden;
-    background: #f0f0f0;
+    background: #f8f9fa;
     height: 100vh;
+    border: 8px solid transparent;
 }
 
+body.danger-active {
+    border: 8px solid #ff0000;
+    animation: danger-flash 0.5s infinite;
+}
+
+@keyframes danger-flash {
+    0%, 100% {
+        border-color: #ff0000;
+        box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.8);
+    }
+    50% {
+        border-color: #ffcc00;
+        box-shadow: inset 0 0 60px rgba(255, 0, 0, 0.9);
+    }
+}
+
+/* Iframe Containers */
 .iframe-container {
     position: absolute;
-    border: 2px solid #333;
+    border: 2px solid #dee2e6;
     background: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
 .iframe-container.active {
-    border-color: #007acc;
-    box-shadow: 0 6px 12px rgba(0, 122, 204, 0.3);
+    border-color: #0d6efd;
+    box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
     z-index: 1000;
 }
 
 .iframe-header {
     height: 30px;
-    background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
-    border-bottom: 1px solid #999;
+    background: linear-gradient(to bottom, #e9ecef, #dee2e6);
+    border-bottom: 1px solid #adb5bd;
     cursor: move;
     display: flex;
     align-items: center;
     padding: 0 10px;
     font-size: 12px;
-    color: #333;
+    color: #212529;
     user-select: none;
+    font-weight: 500;
 }
 
 .iframe-container.active .iframe-header {
-    background: linear-gradient(to bottom, #007acc, #005a9e);
+    background: linear-gradient(to bottom, #0d6efd, #0a58ca);
     color: white;
 }
 
@@ -50,6 +70,7 @@ iframe {
     cursor: default;
 }
 
+/* Resize Handles */
 .resize-handle {
     position: absolute;
     background: transparent;
@@ -137,81 +158,76 @@ iframe {
     display: block;
 }
 
+/* Reset Button */
 .reset-button {
     position: fixed;
     top: 10px;
     right: 10px;
-    padding: 10px 20px;
-    background: #007acc;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 10000;
     user-select: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
 .reset-button:hover {
-    background: #005a9e;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.reset-button:active {
-    background: #004578;
-}
-
+/* Help Icon */
 .help-icon {
     position: fixed;
     top: 10px;
     right: 150px;
     width: 40px;
     height: 40px;
-    background: #4CAF50;
+    background: #198754;
     color: white;
     border: none;
     border-radius: 50%;
     cursor: help;
     font-size: 24px;
     font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
     user-select: none;
+    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .help-icon:hover {
-    background: #45a049;
+    background: #157347;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
+/* Help Tooltip */
 .help-tooltip {
     position: fixed;
     top: 60px;
     right: 150px;
     background: white;
-    color: #333;
+    color: #212529;
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     z-index: 10001;
     width: 320px;
     display: none;
     font-size: 13px;
     line-height: 1.6;
+    border: 1px solid #dee2e6;
 }
 
-.help-icon:hover+.help-tooltip,
+.help-icon:hover + .help-tooltip,
 .help-tooltip:hover {
     display: block;
 }
 
 .help-tooltip h3 {
     margin: 0 0 10px 0;
-    color: #007acc;
+    color: #0d6efd;
     font-size: 16px;
+    font-weight: 600;
 }
 
 .help-tooltip ul {
@@ -224,10 +240,10 @@ iframe {
 }
 
 .help-tooltip strong {
-    color: #007acc;
+    color: #0d6efd;
 }
 
-/* Block navigation bar area */
+/* Navigation Blockers */
 .nav-blocker-top {
     position: absolute;
     top: 30px;
@@ -250,42 +266,20 @@ iframe {
     pointer-events: auto;
 }
 
+/* Footer */
 footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: #333;
+    background: #212529;
     color: white;
     text-align: center;
     padding: 10px 0;
     font-size: 12px;
 }
 
-h1 {
-    margin: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-}
-
-h2 {
-    margin: 20px;
-    font-size: 20px;
-}
-
-p {
-    margin: 20px;
-    font-size: 16px;    
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 15px;
-    margin: 20px;
-}
-
-header {
+/* Fixed Top Header */
+.fixed-top-header {
     position: fixed;
     top: 0;
     left: 0;
@@ -293,18 +287,25 @@ header {
     z-index: 10000;
 }
 
-.warning {
-    background-color: red;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
+#header-content {
+    background-color: #ff0000 !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 20px !important;
+    font-size: 32px !important;
+    border-bottom: 4px solid #ffcc00 !important;
+    animation: header-pulse 0.6s infinite;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.d-none {
-    display: none;
-}
-
-.d-block {
-    display: block;
+@keyframes header-pulse {
+    0%, 100% {
+        background-color: #ff0000;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+    }
+    50% {
+        background-color: #ff4444;
+        box-shadow: 0 0 40px rgba(255, 0, 0, 1);
+    }
 }
