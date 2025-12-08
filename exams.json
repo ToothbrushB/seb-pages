@@ -25,15 +25,14 @@
     "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
     "custom_name": "Hoogdy Boogidy",
     "beks": [
-      "2835fd761bc20d4eae6db8df23c5c627cdae8cab0f6e8f8ab7116dd3b8a09e05",
-      "abc"
+      "848ee1c9aa31f8e85d414f97678c738d4d78bf01271c65986a06e48111987297"
     ],
-    "ck": "20772f2f3259336662e24362684d049bf41f973363744599102a5592636e277b",
-    "ua": "123",
+    "ck": "5c2be9c08d7569dabce4ce673608b2a853e7a4a3654a35492ccc3f37521b9dce",
+    "ua": "Dawson",
     "tools": [
       {
         "id": "70d08e52-4ad2-4908-a4b9-3ea8a5991a01",
-        "name": "Exam.net",
+        "name": "bioethics",
         "url": "https://docs.google.com/document/d/e/2PACX-1vQTAp0bgB1N0TILzcKyPU2hOSrV0H2uNDKm1IOEGd-EG7MwBmrTr-tD7Q-RplFMtHcSe_zCFEgBTTnH/pub?embedded=true",
         "icon": "bi-app"
       },
@@ -42,6 +41,12 @@
         "name": "Desmos Graphing Calculator",
         "url": "https://www.desmos.com/testing/cb-sat-ap/graphing",
         "icon": "bi-graph-up"
+      },
+      {
+        "id": "e6ba69d6-05f8-4d8d-b129-92a4e4fc78ab",
+        "name": "Desmos Matrix Calculator",
+        "url": "https://www.desmos.com/matrix",
+        "icon": "bi-table"
       }
     ]
   }
