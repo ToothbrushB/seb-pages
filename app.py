@@ -1,15 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
 import json
 import os
 import uuid
 import secrets
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
-app.config['SERVER_NAME'] = 'kgzvb717-5000.euw.devtunnels.ms'
 # Path to the exam database JSON file
 EXAM_DB_PATH = 'exams.json'
 EXAM_APPS_PATH = 'exam_apps.json'
+USERS_DB_PATH = 'users.json'
 
 # Load exams from JSON file
 def load_exams():
@@ -22,6 +25,13 @@ def load_exams():
 def load_exam_apps():
     if os.path.exists(EXAM_APPS_PATH):
         with open(EXAM_APPS_PATH, 'r') as f:
+            return json.load(f)
+    return {}
+
+# Load users from JSON file
+def load_users():
+    if os.path.exists(USERS_DB_PATH):
+        with open(USERS_DB_PATH, 'r') as f:
             return json.load(f)
     return {}
 
@@ -68,11 +78,69 @@ def exam_key_exists(exam_key):
 # Initialize exams dictionary
 EXAMS = load_exams()
 EXAM_APPS = load_exam_apps()
+USERS = load_users()
+
+# Authentication decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please login to access this page', 'error')
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        
+        if username in USERS:
+            user = USERS[username]
+            if check_password_hash(user['password_hash'], password):
+                session['username'] = username
+                session['user_id'] = user.get('user_id')
+                session['name'] = user.get('name', username)
+                flash(f'Welcome, {user.get("name", username)}!', 'success')
+                
+                # Redirect to next page if specified, otherwise to index
+                next_page = request.args.get('next')
+                if next_page:
+                    return redirect(next_page)
+                return redirect(url_for('index'))
+        
+        flash('Invalid username or password', 'error')
+        return redirect(url_for('login'))
+    
+    # If already logged in, redirect to index
+    if 'username' in session:
+        return redirect(url_for('index'))
+    
+    return render_template('login.html')
+
+# Logout route
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.pop('user_id', None)
+    session.pop('name', None)
+    flash('You have been logged out', 'success')
+    return redirect(url_for('login'))
 
 @app.route('/')
+@login_required
 def index():
     """Home page showing all registered exams"""
-    return render_template('index.html', exams=EXAMS)
+    # Filter exams by current user
+    user_id = session.get('user_id')
+    user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
+    return render_template('index.html', exams=user_exams)
+
+@app.route('/hash_generator')
+def hash_generator():
+    return render_template('hash_generator.html')
 
 @app.route('/<exam_id>/exam')
 def exam(exam_id):
@@ -94,11 +162,10 @@ def exam(exam_id):
             app_info['id'] = app_id
             available_apps.append(app_info)
     
-    # Prepare SEB data
     seb = {
         'bek': exam_data.get('bek', ''),
         'ck': exam_data.get('ck', ''),
-        'ua': exam_data.get('ua', '')
+        'ua': hashlib.sha256(url_for('exam', exam_id=exam_id)+exam_data.get('ua', '')).hexdigest()
     }
     
     return render_template(
@@ -127,7 +194,7 @@ def exam_app(exam_id, app_id):
     seb = {
         'bek': exam_data.get('bek', ''),
         'ck': exam_data.get('ck', ''),
-        'ua': exam_data.get('ua', '')
+        'ua': hashlib.sha256(url_for('exam_app', exam_id=exam_id, app_id=app_id)+exam_data.get('ua', '')).hexdigest()
     }
     
     return render_template(
@@ -139,6 +206,7 @@ def exam_app(exam_id, app_id):
     )
 
 @app.route('/register', methods=['GET', 'POST'])
+@login_required
 def register():
     """Register a new exam"""
     if request.method == 'POST':
@@ -174,6 +242,7 @@ def register():
         EXAMS[exam_id] = {
             'exam_key': exam_key,
             'custom_name': custom_name,
+            'user_id': session.get('user_id'),
             'bek': bek,
             'ck': ck,
             'ua': ua,
@@ -190,10 +259,16 @@ def register():
     return render_template('register.html', exam_apps=EXAM_APPS)
 
 @app.route('/edit/<exam_id>', methods=['GET', 'POST'])
+@login_required
 def edit_exam(exam_id):
     """Edit an existing exam"""
     if exam_id not in EXAMS:
         flash(f'Exam "{exam_id}" not found', 'error')
+        return redirect(url_for('index'))
+    
+    # Check ownership
+    if EXAMS[exam_id].get('user_id') != session.get('user_id'):
+        flash('You do not have permission to edit this exam', 'error')
         return redirect(url_for('index'))
     
     if request.method == 'POST':
@@ -209,9 +284,10 @@ def edit_exam(exam_id):
             flash('At least one app must be selected', 'error')
             return redirect(url_for('edit_exam', exam_id=exam_id))
         
-        # Update exam entry (preserve exam_key)
+        # Update exam entry (preserve exam_key and user_id)
         EXAMS[exam_id] = {
             'exam_key': EXAMS[exam_id]['exam_key'],  # Keep original exam_key
+            'user_id': EXAMS[exam_id].get('user_id'),  # Keep original user_id
             'custom_name': custom_name,
             'bek': bek,
             'ck': ck,
@@ -228,9 +304,15 @@ def edit_exam(exam_id):
     return render_template('edit.html', exam_id=exam_id, exam=EXAMS[exam_id], exam_apps=EXAM_APPS)
 
 @app.route('/delete/<exam_id>', methods=['POST'])
+@login_required
 def delete_exam(exam_id):
     """Delete an exam"""
     if exam_id in EXAMS:
+        # Check ownership
+        if EXAMS[exam_id].get('user_id') != session.get('user_id'):
+            flash('You do not have permission to delete this exam', 'error')
+            return redirect(url_for('index'))
+        
         del EXAMS[exam_id]
         save_exams(EXAMS)
         flash(f'Exam "{exam_id}" deleted successfully!', 'success')
@@ -240,10 +322,16 @@ def delete_exam(exam_id):
     return redirect(url_for('index'))
 
 @app.route('/exam/<exam_id>/details')
+@login_required
 def exam_details(exam_id):
     """Show exam details including generated keys"""
     if exam_id not in EXAMS:
         flash(f'Exam not found', 'error')
+        return redirect(url_for('index'))
+    
+    # Check ownership
+    if EXAMS[exam_id].get('user_id') != session.get('user_id'):
+        flash('You do not have permission to view this exam', 'error')
         return redirect(url_for('index'))
     
     exam_data = EXAMS[exam_id]
@@ -257,9 +345,13 @@ def exam_details(exam_id):
     )
 
 @app.route('/api/exams')
+@login_required
 def api_exams():
     """API endpoint to get all exams as JSON"""
-    return jsonify(EXAMS)
+    # Filter exams by current user
+    user_id = session.get('user_id')
+    user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
+    return jsonify(user_exams)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

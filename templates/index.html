@@ -25,17 +25,18 @@
                         <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/DesmosMatrixGraphing.html">Desmos Matrix & CB Graphing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/HashGenerator.html">Hash Generator</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Tools.html">Tools</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('register') }}">
                             <i class="bi bi-plus-circle"></i> Register Exam
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link text-light">
+                            <i class="bi bi-person-circle"></i> {{ session.get('name', session.get('username', 'User')) }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </li>
                 </ul>
@@ -72,7 +73,7 @@
                             <a href="{{ url_for('register') }}" class="btn btn-light">
                                 <i class="bi bi-plus-circle"></i> Register New Exam
                             </a>
-                            <a href="/HashGenerator.html" class="btn btn-outline-light">
+                            <a href="{{ url_for('hash_generator') }}" class="btn btn-outline-light">
                                 <i class="bi bi-hash"></i> Generate Hashes
                             </a>
                         </div>
@@ -115,9 +116,9 @@
                                                 <span class="badge bg-{{ 'success' if exam.ua else 'secondary' }}" title="User Agent">UA</span>
                                             </td>
                                             <td>
-                                                <a href="{{ url_for('exam', exam_id=exam_id) }}" 
-                                                   class="btn btn-sm btn-success" target="_blank"
-                                                   title="Open exam in new window">
+                                                <a href="{{ url_for('exam_details', exam_id=exam_id) }}" 
+                                                   class="btn btn-sm btn-success"
+                                                   title="Open exam details">
                                                     <i class="bi bi-box-arrow-up-right"></i> Open
                                                 </a>
                                                 <a href="{{ url_for('edit_exam', exam_id=exam_id) }}" 
@@ -155,9 +156,7 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled">
-                                <li><a href="/DesmosMatrixGraphing.html"><i class="bi bi-graph-up"></i> Desmos Matrix & CB Graphing</a></li>
-                                <li><a href="/HashGenerator.html"><i class="bi bi-hash"></i> Hash Generator</a></li>
-                                <li><a href="/Tools.html"><i class="bi bi-grid"></i> Tools Directory</a></li>
+                                <li><a href="{{ url_for('hash_generator') }}"><i class="bi bi-hash"></i> Hash Generator</a></li>
                             </ul>
                         </div>
                     </div>
