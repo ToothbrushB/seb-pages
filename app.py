@@ -151,21 +151,14 @@ def exam(exam_id):
     
     exam_data = EXAMS[exam_id]
     
-    # Get the list of app IDs for this exam
-    app_ids = exam_data.get('apps', ['desmos-graphing'])
+    # Get custom tools for this exam
+    tools = exam_data.get('tools', [])
     
-    # Build list of app details
-    available_apps = []
-    for app_id in app_ids:
-        if app_id in EXAM_APPS:
-            app_info = EXAM_APPS[app_id].copy()
-            app_info['id'] = app_id
-            available_apps.append(app_info)
-    
+    # Prepare SEB data
     seb = {
-        'bek': exam_data.get('bek', ''),
+        'beks': exam_data.get('beks', [exam_data.get('bek', '')]),  # Support both new array and old single value
         'ck': exam_data.get('ck', ''),
-        'ua': hashlib.sha256(url_for('exam', exam_id=exam_id)+exam_data.get('ua', '')).hexdigest()
+        'ua': hashlib.sha256((url_for('exam', exam_id=exam_id, _external=True)+exam_data.get('ua', '')).encode('utf-8')).hexdigest()
     }
     
     return render_template(
@@ -173,7 +166,7 @@ def exam(exam_id):
         exam_id=exam_id,
         exam_key=exam_data.get('exam_key', exam_id),
         seb=seb,
-        apps=available_apps
+        apps=tools
     )
 
 @app.route('/<exam_id>/app/<app_id>')
@@ -183,26 +176,32 @@ def exam_app(exam_id, app_id):
         flash(f'Exam "{exam_id}" not found', 'error')
         return redirect(url_for('index'))
     
-    if app_id not in EXAM_APPS:
-        flash(f'App "{app_id}" not found', 'error')
-        return redirect(url_for('exam', exam_id=exam_id))
-    
     exam_data = EXAMS[exam_id]
-    app_data = EXAM_APPS[app_id]
+    
+    # Find the tool in the exam's tools list
+    tool = None
+    for t in exam_data.get('tools', []):
+        if t['id'] == app_id:
+            tool = t
+            break
+    
+    if not tool:
+        flash(f'Tool not found', 'error')
+        return redirect(url_for('exam', exam_id=exam_id))
     
     # Prepare SEB data
     seb = {
-        'bek': exam_data.get('bek', ''),
+        'beks': exam_data.get('beks', [exam_data.get('bek', '')]),  # Support both new array and old single value
         'ck': exam_data.get('ck', ''),
-        'ua': hashlib.sha256(url_for('exam_app', exam_id=exam_id, app_id=app_id)+exam_data.get('ua', '')).hexdigest()
+        'ua': hashlib.sha256((url_for('exam_app', exam_id=exam_id, app_id=app_id, _external=True)+exam_data.get('ua', '')).encode('utf-8')).hexdigest()
     }
     
     return render_template(
         'exam_app.html',
         exam_key=exam_data.get('exam_key', exam_id),
         seb=seb,
-        iframe_url=app_data['url'],
-        app_name=app_data['name']
+        iframe_url=tool['url'],
+        app_name=tool['name']
     )
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -210,17 +209,31 @@ def exam_app(exam_id, app_id):
 def register():
     """Register a new exam"""
     if request.method == 'POST':
-        bek = request.form.get('bek', '').strip()
+        beks = [b.strip() for b in request.form.getlist('bek[]') if b.strip()]
         ck = request.form.get('ck', '').strip()
         ua = request.form.get('ua', '').strip()
         custom_name = request.form.get('custom_name', '').strip()
         
-        # Get selected apps
-        selected_apps = request.form.getlist('apps')
+        # Get custom tools
+        tool_names = request.form.getlist('tool_name[]')
+        tool_urls = request.form.getlist('tool_url[]')
+        tool_ids = request.form.getlist('tool_id[]')
+        tool_icons = request.form.getlist('tool_icon[]')
+        
+        # Build tools list
+        tools = []
+        for i in range(len(tool_names)):
+            if tool_names[i] and tool_urls[i]:
+                tools.append({
+                    'id': tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4()),
+                    'name': tool_names[i],
+                    'url': tool_urls[i],
+                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app'
+                })
         
         # Validation
-        if not selected_apps:
-            flash('At least one app must be selected', 'error')
+        if not tools:
+            flash('At least one tool must be added', 'error')
             return redirect(url_for('register'))
         
         # Generate unique exam ID (UUID)
@@ -243,10 +256,10 @@ def register():
             'exam_key': exam_key,
             'custom_name': custom_name,
             'user_id': session.get('user_id'),
-            'bek': bek,
+            'beks': beks,
             'ck': ck,
             'ua': ua,
-            'apps': selected_apps
+            'tools': tools
         }
         
         # Save to file
@@ -273,15 +286,29 @@ def edit_exam(exam_id):
     
     if request.method == 'POST':
         custom_name = request.form.get('custom_name', '').strip()
-        bek = request.form.get('bek', '').strip()
+        beks = [b.strip() for b in request.form.getlist('bek[]') if b.strip()]
         ck = request.form.get('ck', '').strip()
         ua = request.form.get('ua', '').strip()
         
-        # Get selected apps
-        selected_apps = request.form.getlist('apps')
+        # Get custom tools
+        tool_names = request.form.getlist('tool_name[]')
+        tool_urls = request.form.getlist('tool_url[]')
+        tool_ids = request.form.getlist('tool_id[]')
+        tool_icons = request.form.getlist('tool_icon[]')
         
-        if not selected_apps:
-            flash('At least one app must be selected', 'error')
+        # Build tools list
+        tools = []
+        for i in range(len(tool_names)):
+            if tool_names[i] and tool_urls[i]:
+                tools.append({
+                    'id': tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4()),
+                    'name': tool_names[i],
+                    'url': tool_urls[i],
+                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app'
+                })
+        
+        if not tools:
+            flash('At least one tool must be added', 'error')
             return redirect(url_for('edit_exam', exam_id=exam_id))
         
         # Update exam entry (preserve exam_key and user_id)
@@ -289,10 +316,10 @@ def edit_exam(exam_id):
             'exam_key': EXAMS[exam_id]['exam_key'],  # Keep original exam_key
             'user_id': EXAMS[exam_id].get('user_id'),  # Keep original user_id
             'custom_name': custom_name,
-            'bek': bek,
+            'beks': beks,
             'ck': ck,
             'ua': ua,
-            'apps': selected_apps
+            'tools': tools
         }
         
         # Save to file

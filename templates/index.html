@@ -109,9 +109,9 @@
                                                 </button>
                                             </td>
                                             <td>{{ exam.custom_name if exam.custom_name else '<em class="text-muted">Not set</em>' | safe }}</td>
-                                            <td><span class="badge bg-primary">{{ exam.apps|length if exam.apps else 0 }} app(s)</span></td>
+                                            <td><span class="badge bg-primary">{{ exam.tools|length if exam.tools else (exam.apps|length if exam.apps else 0) }} tool(s)</span></td>
                                             <td>
-                                                <span class="badge bg-{{ 'success' if exam.bek else 'secondary' }} me-1" title="Browser Exam Key">BEK</span>
+                                                <span class="badge bg-{{ 'success' if exam.beks|length>0 else 'secondary' }} me-1" title="Browser Exam Key">BEK</span>
                                                 <span class="badge bg-{{ 'success' if exam.ck else 'secondary' }} me-1" title="Config Key">CK</span>
                                                 <span class="badge bg-{{ 'success' if exam.ua else 'secondary' }}" title="User Agent">UA</span>
                                             </td>

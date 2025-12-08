@@ -94,7 +94,7 @@
                                     </tr>
                                     <tr>
                                         <th>Available Apps:</th>
-                                        <td>{{ exam.apps|length }} app(s)</td>
+                                        <td>{{ exam.tools|length }} app(s)</td>
                                     </tr>
                                 </table>
                             </div>
@@ -102,8 +102,8 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Browser Exam Key:</th>
-                                        <td><span class="badge bg-{{ 'success' if exam.bek else 'secondary' }}">
-                                            {{ 'Configured' if exam.bek else 'Not Set' }}
+                                        <td><span class="badge bg-{{ 'success' if exam.beks|length>0 else 'secondary' }}">
+                                            {{ 'Configured' if exam.beks|length>0 else 'Not Set' }}
                                         </span></td>
                                     </tr>
                                     <tr>

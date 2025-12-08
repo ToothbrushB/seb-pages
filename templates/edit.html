@@ -60,10 +60,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="bek" class="form-label">Browser Exam Key (BEK)</label>
-                                <input type="text" class="form-control font-monospace" id="bek" name="bek" 
-                                       value="{{ exam.bek }}" placeholder="Enter BEK hash">
-                                <div class="form-text">SHA256 hash for SEB browser exam key verification.</div>
+                                <label class="form-label">Browser Exam Keys (BEK)</label>
+                                <div class="form-text mb-2">Add one or more Browser Exam Keys for this exam.</div>
+                                <div id="bekContainer">
+                                    <!-- BEKs will be added here dynamically -->
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addBEK()">
+                                    <i class="bi bi-plus-circle"></i> Add BEK
+                                </button>
                             </div>
 
                             <div class="mb-3">
@@ -77,27 +81,31 @@
                                 <label for="ua" class="form-label">User Agent (UA)</label>
                                 <input type="text" class="form-control font-monospace" id="ua" name="ua" 
                                        value="{{ exam.ua }}" placeholder="Enter UA hash">
-                                <div class="form-text">SHA256 hash for SEB user agent verification.</div>
+                                <div class="form-text">SEB user agent, excluding [].</div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Available Applications <span class="text-danger">*</span></label>
-                                <div class="form-text mb-2">Select one or more applications that will be available during this exam.</div>
-                                <div class="row g-3">
-                                    {% for app_id, app in exam_apps.items() %}
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="apps" 
-                                                   value="{{ app_id }}" id="app_{{ app_id }}"
-                                                   {% if app_id in exam.apps %}checked{% endif %}>
-                                            <label class="form-check-label" for="app_{{ app_id }}">
-                                                <strong><i class="bi {{ app.icon }}"></i> {{ app.name }}</strong>
-                                                <br>
-                                                <small class="text-muted">{{ app.description }}</small>
-                                            </label>
-                                        </div>
+                                <label class="form-label">Available Tools <span class="text-danger">*</span></label>
+                                <div class="form-text mb-2">Add tools that will be available during this exam.</div>
+                                
+                                <div id="toolsContainer">
+                                    <!-- Tools will be added here dynamically -->
+                                </div>
+                                
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addTool()">
+                                    <i class="bi bi-plus-circle"></i> Add Tool
+                                </button>
+                                
+                                <div class="form-text mt-2">
+                                    <strong>Quick Add Common Tools:</strong>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for app_id, app in exam_apps.items() %}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                onclick="addPredefinedTool('{{ app.name }}', '{{ app.url }}', '{{ app.icon }}')">
+                                            <i class="bi {{ app.icon }}"></i> {{ app.name }}
+                                        </button>
+                                        {% endfor %}
                                     </div>
-                                    {% endfor %}
                                 </div>
                             </div>
 
@@ -117,5 +125,113 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let toolCount = 0;
+        let bekCount = 0;
+        
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        function addBEK(value = '') {
+            bekCount++;
+            
+            const bekHtml = `
+                <div class="input-group mb-2" id="bek-${bekCount}">
+                    <input type="text" class="form-control font-monospace" name="bek[]" 
+                           placeholder="Enter BEK hash" value="${value}" required>
+                    <button type="button" class="btn btn-danger" 
+                            onclick="removeBEK(${bekCount})" title="Remove BEK">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('bekContainer').insertAdjacentHTML('beforeend', bekHtml);
+        }
+        
+        function removeBEK(id) {
+            const bekElement = document.getElementById('bek-' + id);
+            if (bekElement) {
+                bekElement.remove();
+            }
+        }
+        
+        function addTool(name = '', url = '', icon = 'bi-app', toolId = null) {
+            if (!toolId) {
+                toolId = generateUUID();
+            }
+            toolCount++;
+            
+            const toolHtml = `
+                <div class="card mb-2" id="tool-${toolCount}">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" name="tool_name[]" 
+                                       placeholder="Tool Name (e.g., Desmos Graphing)" 
+                                       value="${name}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="url" class="form-control" name="tool_url[]" 
+                                       placeholder="Tool URL (e.g., https://...)" 
+                                       value="${url}" required>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm w-100" 
+                                        onclick="removeTool(${toolCount})" title="Remove Tool">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="tool_id[]" value="${toolId}">
+                        <input type="hidden" name="tool_icon[]" value="${icon}">
+                        <div class="form-text mt-1">
+                            <small>Tool ID: <code>${toolId}</code></small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('toolsContainer').insertAdjacentHTML('beforeend', toolHtml);
+        }
+        
+        function addPredefinedTool(name, url, icon) {
+            addTool(name, url, icon);
+        }
+        
+        function removeTool(id) {
+            document.getElementById('tool-' + id).remove();
+        }
+        
+        // Pre-populate existing BEKs and tools
+        window.addEventListener('DOMContentLoaded', function() {
+            // Load existing BEKs
+            {% if exam.beks %}
+                {% for bek in exam.beks %}
+                    addBEK('{{ bek }}');
+                {% endfor %}
+            {% elif exam.bek %}
+                addBEK('{{ exam.bek }}');
+            {% else %}
+                addBEK();
+            {% endif %}
+            
+            // Load existing tools
+            const existingTools = {{ exam.tools | tojson | safe if exam.tools else '[]' | safe }};
+            
+            if (existingTools.length > 0) {
+                existingTools.forEach(tool => {
+                    addTool(tool.name, tool.url, tool.icon || 'bi-app', tool.id);
+                });
+            } else {
+                // Add one empty tool if none exist
+                addTool();
+            }
+        });
+    </script>
 </body>
 </html>

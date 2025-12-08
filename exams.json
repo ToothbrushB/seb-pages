@@ -1,39 +1,48 @@
 {
-  "6183a942-4eb3-4b0b-8d86-8faacf2bccf2": {
-    "exam_key": "ZULU-METEOR-SIERRA-VIOLET",
-    "custom_name": "Math 2025",
-    "user_id": "1a3bebe9-d5d6-46ce-b5fb-aa1a779fd4ec",
-    "bek": "blah",
-    "ck": "blah",
-    "ua": "blah",
-    "apps": [
-      "desmos-graphing",
-      "desmos-scientific",
-      "geogebra"
+  "a1b2c3d4-e5f6-7890-abcd-ef1234567890": {
+    "exam_key": "ALPHA-BRAVO-CHARLIE-DELTA",
+    "custom_name": "Sample Math Exam",
+    "bek": "abc123def456",
+    "ck": "xyz789uvw012",
+    "ua": "mno345pqr678",
+    "tools": [
+      {
+        "id": "f1e2d3c4-b5a6-7890-1234-567890abcdef",
+        "name": "Desmos Graphing Calculator",
+        "url": "https://www.desmos.com/testing/cb-sat-ap/graphing",
+        "icon": "bi-graph-up"
+      },
+      {
+        "id": "a9b8c7d6-e5f4-3210-9876-543210fedcba",
+        "name": "Desmos Scientific Calculator",
+        "url": "https://www.desmos.com/scientific",
+        "icon": "bi-calculator"
+      }
     ]
   },
-  "38db1190-253b-48d8-ba4f-0c9b26fea6d4": {
-    "exam_key": "DRIFT-VORTEX-RADAR-JAGUAR",
+  "1c635ae7-0eda-461e-b813-71dc3c20f096": {
+    "exam_key": "ZULU-UNIFORM-XENON-WOLF",
     "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
-    "custom_name": "asdfa",
-    "bek": "df",
-    "ck": "sga",
-    "ua": "fsaf",
-    "apps": [
-      "desmos-graphing",
-      "desmos-matrix",
-      "wolfram-alpha"
-    ]
-  },
-  "980969d1-44df-4002-9e4e-fbcd5c32dcc8": {
-    "exam_key": "MIKE-UNICORN-NEXUS-RADAR",
-    "custom_name": "",
-    "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
-    "bek": "",
-    "ck": "",
-    "ua": "",
-    "apps": [
-      "desmos-graphing"
+    "custom_name": "Hoogdy Boogidy",
+    "beks": [
+      "2835fd761bc20d4eae6db8df23c5c627cdae8cab0f6e8f8ab7116dd3b8a09e05",
+      "abc"
+    ],
+    "ck": "20772f2f3259336662e24362684d049bf41f973363744599102a5592636e277b",
+    "ua": "123",
+    "tools": [
+      {
+        "id": "70d08e52-4ad2-4908-a4b9-3ea8a5991a01",
+        "name": "Exam.net",
+        "url": "https://docs.google.com/document/d/e/2PACX-1vQTAp0bgB1N0TILzcKyPU2hOSrV0H2uNDKm1IOEGd-EG7MwBmrTr-tD7Q-RplFMtHcSe_zCFEgBTTnH/pub?embedded=true",
+        "icon": "bi-app"
+      },
+      {
+        "id": "4983d387-9ef3-4eac-a755-cc943ff8182c",
+        "name": "Desmos Graphing Calculator",
+        "url": "https://www.desmos.com/testing/cb-sat-ap/graphing",
+        "icon": "bi-graph-up"
+      }
     ]
   }
 }
