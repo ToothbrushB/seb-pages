@@ -164,7 +164,7 @@
             }
         }
         
-        function addTool(name = '', url = '', icon = 'bi-app') {
+        function addTool(name = '', url = '', icon = 'bi-app', openInNewTab = false) {
             const toolId = generateUUID();
             toolCount++;
             
@@ -188,6 +188,13 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input" name="tool_open_new_tab[]" 
+                                   value="${toolId}" ${openInNewTab ? 'checked' : ''}>
+                            <label class="form-check-label">
+                                <i class="bi bi-box-arrow-up-right"></i> Open in new tab (direct link, not in iframe)
+                            </label>
                         </div>
                         <input type="hidden" name="tool_id[]" value="${toolId}">
                         <input type="hidden" name="tool_icon[]" value="${icon}">

@@ -4,6 +4,7 @@ import json
 import hashlib
 import base64
 from datetime import datetime
+import gzip
 
 
 def generate_config_key(plist_data):
@@ -137,23 +138,44 @@ def _to_seb_json_recursive(obj):
         return json.dumps(obj, ensure_ascii=False)
 
 
-# Test with existing code
-if __name__ == "__main__":
-    with open('DesmosV1.seb', 'rb') as f:
-        seb_data = f.read()
-        dataRaw = decrypt_seb_config(seb_data, password='PhysicsRocks')
+def create_seb_from_json(json_file_path, output_seb_path, password):
+    """
+    Create a password-encrypted .seb file from a JSON config file.
     
-    data = plistlib.loads(dataRaw)
+    Args:
+        json_file_path (str): Path to input JSON config file
+        output_seb_path (str): Path for output .seb file
+        password (str): Password for encryption
     
-    # Generate config key
-    config_key = generate_config_key(data)
-    print(f"Config Key: {config_key}")
-    print(f"Length: {len(config_key)} characters")
+    Returns:
+        str: Config key hash for the created .seb file
+    """
+    # Step 1: Read JSON config file
+    with open(json_file_path, 'r', encoding='utf-8') as f:
+        config_dict = json.load(f)
     
-    # Also show the SEB-JSON for debugging (first 500 chars)
-    data_copy = dict(data)
-    if 'originatorVersion' in data_copy:
-        del data_copy['originatorVersion']
-    seb_json = _convert_to_seb_json(data_copy)
-    # print(f"\nSEB-JSON (first 500 chars):\n{seb_json[:500]}...")
-    print(seb_json)
+    # generate 24 byte salt in base 64 for examKeySalt
+    salt = os.urandom(24)
+    config_dict["examKeySalt"] = base64.b64encode(salt).decode('ascii')
+    
+    # Step 2: Convert JSON dict to plist XML format
+    plist_xml = plistlib.dumps(config_dict, fmt=plistlib.FMT_XML)
+    
+    encrypted_data = encrypt_seb_config(plist_xml, password=password)
+    
+    # Step 8: Save as .seb file
+    with open(output_seb_path, 'wb') as f:
+        f.write(encrypted_data)
+    
+    print(f"Created .seb file: {output_seb_path}")
+    
+if __name__ == '__main__':
+    password="123"
+    with open("Dawson_reencrypted.seb", 'rb') as f:
+            seb_file_data = f.read()
+    decrypted = decrypt_seb_config(seb_file_data, password=password)
+    print(decrypted.decode('utf-8'))
+    # reencrypted = encrypt_seb_config(decrypted, password=password)
+    # with open("Dawson_reencrypted.seb", 'wb') as f:
+        # f.write(reencrypted)
+        

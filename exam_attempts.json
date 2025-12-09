@@ -48,5 +48,47 @@
       "access_type": "exam_launch",
       "attempt_id": "55f58302-34a8-4f44-a482-13f3508a5f18"
     }
+  ],
+  "3df77698-2ca3-4a23-ab8d-4413ef9e4d8a": [
+    {
+      "timestamp": "2025-12-09T18:31:40.233812",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "f4371da8-5bfd-40d6-8e71-c2bc7eb3ef2d"
+    },
+    {
+      "timestamp": "2025-12-09T18:31:41.262240",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "tool_access:APCR",
+      "attempt_id": "52b65dcf-6bd6-4f1e-8a46-e35de8906aac"
+    },
+    {
+      "timestamp": "2025-12-09T18:31:53.477029",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "tool_access:APCR",
+      "attempt_id": "330d93ae-effe-497c-871e-d9c1f9974715"
+    },
+    {
+      "timestamp": "2025-12-09T18:32:55.787056",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "7f43257b-3737-40a0-8a46-09f85a301c00"
+    },
+    {
+      "timestamp": "2025-12-09T18:37:41.453055",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "b15a25ff-2aa0-4a7d-8e2a-78bdd69ddd4d"
+    }
   ]
 }

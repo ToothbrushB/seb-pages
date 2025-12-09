@@ -130,15 +130,18 @@ def register():
         tool_urls = request.form.getlist('tool_url[]')
         tool_ids = request.form.getlist('tool_id[]')
         tool_icons = request.form.getlist('tool_icon[]')
+        tool_open_new_tab = request.form.getlist('tool_open_new_tab[]')  # Get checked tool IDs
         
         tools = []
         for i in range(len(tool_names)):
             if tool_names[i] and tool_urls[i]:
+                tool_id = tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4())
                 tools.append({
-                    'id': tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4()),
+                    'id': tool_id,
                     'name': tool_names[i],
                     'url': tool_urls[i],
-                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app'
+                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app',
+                    'open_in_new_tab': tool_id in tool_open_new_tab
                 })
         
         if not tools:
@@ -195,15 +198,18 @@ def edit_exam(exam_id):
         tool_urls = request.form.getlist('tool_url[]')
         tool_ids = request.form.getlist('tool_id[]')
         tool_icons = request.form.getlist('tool_icon[]')
+        tool_open_new_tab = request.form.getlist('tool_open_new_tab[]')  # Get checked tool IDs
         
         tools = []
         for i in range(len(tool_names)):
             if tool_names[i] and tool_urls[i]:
+                tool_id = tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4())
                 tools.append({
-                    'id': tool_ids[i] if i < len(tool_ids) else str(uuid.uuid4()),
+                    'id': tool_id,
                     'name': tool_names[i],
                     'url': tool_urls[i],
-                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app'
+                    'icon': tool_icons[i] if i < len(tool_icons) else 'bi-app',
+                    'open_in_new_tab': tool_id in tool_open_new_tab
                 })
         
         if not tools:

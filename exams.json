@@ -1,1 +1,19 @@
-{}
+{
+  "3df77698-2ca3-4a23-ab8d-4413ef9e4d8a": {
+    "exam_key": "VIOLET-MATRIX-KINETIC-ECHO",
+    "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
+    "custom_name": "",
+    "beks": [],
+    "ck": "",
+    "ua": "",
+    "tools": [
+      {
+        "id": "8baf35d7-ee5c-45a9-9292-9113ddd18597",
+        "name": "APCR",
+        "url": "https://apclassroom.collegeboard.org/",
+        "icon": "bi-app",
+        "open_in_new_tab": true
+      }
+    ]
+  }
+}
