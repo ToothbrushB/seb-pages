@@ -1,0 +1,52 @@
+{
+  "fb5069ed-6671-4d14-94b9-da3be137ffae": [
+    {
+      "timestamp": "2025-12-09T05:06:49.308552",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "d9c9b77f-b5ea-421b-bf14-86bcd7550648"
+    },
+    {
+      "timestamp": "2025-12-09T05:07:18.674721",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "tool_access:Desmos Graphing Calculator",
+      "attempt_id": "0979501c-34dc-49f2-83ee-34f561fad525"
+    },
+    {
+      "timestamp": "2025-12-09T05:27:54.221826",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "5be57848-af40-4381-a3ed-bb6754cce55b"
+    },
+    {
+      "timestamp": "2025-12-09T05:27:59.603778",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "tool_access:Desmos Graphing Calculator",
+      "attempt_id": "6584e97a-ae4a-481a-8812-1c909dd9ba08"
+    },
+    {
+      "timestamp": "2025-12-09T05:28:09.132948",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "tool_access:Desmos Graphing Calculator",
+      "attempt_id": "cadb9981-e3a9-4ae5-8ff8-cb83f83d7e02"
+    },
+    {
+      "timestamp": "2025-12-09T05:29:38.281610",
+      "google_id": "anonymous",
+      "email": "",
+      "name": "Administrator",
+      "access_type": "exam_launch",
+      "attempt_id": "55f58302-34a8-4f44-a482-13f3508a5f18"
+    }
+  ]
+}

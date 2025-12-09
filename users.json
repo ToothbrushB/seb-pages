@@ -2,11 +2,7 @@
   "admin": {
     "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
     "password_hash": "scrypt:32768:8:1$iOp0H3xpy0Pc78X7$9b572ec1c32cc6bf3ccebb2ff4aa55cf0c2f7828ead6b8b8486e9532a0aa8fabce05a2c2e3e273529073646d1b5720df0191792e08f8714c405f2047b9141cfe",
-    "name": "Administrator"
-  },
-  "teacher": {
-    "user_id": "1a3bebe9-d5d6-46ce-b5fb-aa1a779fd4ec",
-    "password_hash": "scrypt:32768:8:1$DgGX6OuF9bCloQod$5e238036e3cc1b5f89a5af0df48745731edc46394607051682fcccecee73692af1dfe13aed83f69f1529640d47acfba08483fc36ffad65977f86546e6d4f6cf8",
-    "name": "Teacher"
+    "name": "Administrator",
+    "role": "admin"
   }
 }

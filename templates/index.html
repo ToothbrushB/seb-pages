@@ -12,7 +12,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('routes.index') }}">
                 <i class="bi bi-lock-fill"></i> SEB Pages
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -22,10 +22,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('routes.index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register') }}">
+                        <a class="nav-link" href="{{ url_for('routes.register') }}">
                             <i class="bi bi-plus-circle"></i> Register Exam
                         </a>
                     </li>
@@ -35,7 +35,7 @@
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </li>
@@ -70,10 +70,10 @@
                         <div class="card-body">
                             <h5 class="card-title"><i class="bi bi-info-circle"></i> Getting Started</h5>
                             <p class="card-text">Register exams with SEB keys, manage exam configurations, and deliver secure testing environments.</p>
-                            <a href="{{ url_for('register') }}" class="btn btn-light">
+                            <a href="{{ url_for('routes.register') }}" class="btn btn-light">
                                 <i class="bi bi-plus-circle"></i> Register New Exam
                             </a>
-                            <a href="{{ url_for('hash_generator') }}" class="btn btn-outline-light">
+                            <a href="{{ url_for('routes.hash_generator') }}" class="btn btn-outline-light">
                                 <i class="bi bi-hash"></i> Generate Hashes
                             </a>
                         </div>
@@ -116,17 +116,22 @@
                                                 <span class="badge bg-{{ 'success' if exam.ua else 'secondary' }}" title="User Agent">UA</span>
                                             </td>
                                             <td>
-                                                <a href="{{ url_for('exam_details', exam_id=exam_id) }}" 
+                                                <a href="{{ url_for('routes.exam_details', exam_id=exam_id) }}" 
                                                    class="btn btn-sm btn-success"
                                                    title="Open exam details">
                                                     <i class="bi bi-box-arrow-up-right"></i> Open
                                                 </a>
-                                                <a href="{{ url_for('edit_exam', exam_id=exam_id) }}" 
+                                                <a href="{{ url_for('routes.exam_attempts', exam_id=exam_id) }}" 
+                                                   class="btn btn-sm btn-info"
+                                                   title="View exam attempts">
+                                                    <i class="bi bi-clipboard-data"></i> Attempts
+                                                </a>
+                                                <a href="{{ url_for('routes.edit_exam', exam_id=exam_id) }}" 
                                                    class="btn btn-sm btn-warning"
                                                    title="Edit exam">
                                                     <i class="bi bi-pencil"></i> Edit
                                                 </a>
-                                                <form method="POST" action="{{ url_for('delete_exam', exam_id=exam_id) }}" 
+                                                <form method="POST" action="{{ url_for('routes.delete_exam', exam_id=exam_id) }}" 
                                                       style="display:inline;" 
                                                       onsubmit="return confirm('Are you sure you want to delete this exam?');">
                                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete exam">
@@ -142,7 +147,7 @@
                     {% else %}
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle"></i> No exams registered yet. 
-                            <a href="{{ url_for('register') }}" class="alert-link">Register your first exam</a> to get started!
+                            <a href="{{ url_for('routes.register') }}" class="alert-link">Register your first exam</a> to get started!
                         </div>
                     {% endif %}
                 </div>
@@ -156,7 +161,7 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled">
-                                <li><a href="{{ url_for('hash_generator') }}"><i class="bi bi-hash"></i> Hash Generator</a></li>
+                                <li><a href="{{ url_for('routes.hash_generator') }}"><i class="bi bi-hash"></i> Hash Generator</a></li>
                             </ul>
                         </div>
                     </div>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Ended - SEB Pages</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quit-container {
+            max-width: 600px;
+            text-align: center;
+        }
+        .quit-card {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .quit-icon {
+            font-size: 80px;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .quit-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .quit-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .exam-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .exam-info strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="quit-container">
+        <div class="quit-card">
+            {% if exam_found %}
+            <div class="quit-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1 class="quit-title">Exam Session Ended</h1>
+            <p class="quit-message">
+                Your exam session has been ended by your teacher. 
+                You may now safely close this browser window.
+            </p>
+            
+            <div class="exam-info">
+                <p><strong>Exam Key:</strong> {{ exam_key }}</p>
+                <p class="mb-0"><strong>Exam ID:</strong> <code>{{ exam_id }}</code></p>
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-muted small">
+                    <i class="bi bi-info-circle"></i> 
+                    If you have questions about this exam, please contact your teacher.
+                </p>
+            </div>
+            {% else %}
+            <div class="quit-icon">
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            </div>
+            <h1 class="quit-title">Exam Not Found</h1>
+            <p class="quit-message">
+                The exam you're trying to quit could not be found.
+                You may safely close this browser window.
+            </p>
+            
+            <div class="exam-info">
+                <p class="mb-0"><strong>Exam ID:</strong> <code>{{ exam_id }}</code></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

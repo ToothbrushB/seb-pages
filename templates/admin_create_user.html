@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User - SEB Pages Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #0d6efd;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .password-requirements {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .password-requirements ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .password-requirements li {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('routes.index') }}">
+                <i class="bi bi-lock-fill"></i> SEB Pages
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('routes.index') }}">Home</a>
+                <a class="nav-link" href="{{ url_for('routes.admin_dashboard') }}">Admin Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0"><i class="bi bi-person-plus"></i> Create New User</h3>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" action="{{ url_for('routes.admin_create_user') }}">
+                            <!-- User Information Section -->
+                            <div class="form-section">
+                                <h5 class="section-title"><i class="bi bi-info-circle"></i> User Information</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="username" class="form-label"><strong>Username</strong> <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           placeholder="Enter username (e.g., john.smith)" required>
+                                    <div class="form-text">
+                                        Username must be unique. Can contain letters, numbers, dots, and hyphens.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="name" class="form-label"><strong>Full Name</strong> <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           placeholder="Enter user's full name" required>
+                                    <div class="form-text">Display name for the user account.</div>
+                                </div>
+                            </div>
+
+                            <!-- Role Section -->
+                            <div class="form-section">
+                                <h5 class="section-title"><i class="bi bi-shield-lock"></i> User Role</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="role" class="form-label"><strong>Role</strong> <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="teacher" selected>
+                                            Teacher - Can create and manage exams
+                                        </option>
+                                        <option value="admin">
+                                            Admin - Full access to all users and exams
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        <strong>Teacher:</strong> Can only create and manage their own exams.<br>
+                                        <strong>Admin:</strong> Can manage all users and exams, access admin dashboard.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Password Section -->
+                            <div class="form-section">
+                                <h5 class="section-title"><i class="bi bi-key"></i> Password</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label"><strong>Password</strong> <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="Enter a strong password" required>
+                                    <div class="password-requirements">
+                                        <strong>Password Requirements:</strong>
+                                        <ul>
+                                            <li>At least 8 characters long</li>
+                                            <li>Mix of uppercase and lowercase letters recommended</li>
+                                            <li>Include numbers and special characters for better security</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label"><strong>Confirm Password</strong> <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                           placeholder="Re-enter password to confirm" required>
+                                    <div class="form-text">
+                                        Must match the password above.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ url_for('routes.admin_dashboard') }}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Create User
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Additional Information -->
+                        <hr class="my-4">
+                        <div class="alert alert-secondary">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> New User Instructions</h6>
+                            <ul class="mb-0">
+                                <li>After creation, the user can login with their username and password.</li>
+                                <li>Teachers can immediately start creating exams.</li>
+                                <li>Admins will have access to the admin dashboard at <code>/admin</code>.</li>
+                                <li>Passwords are securely hashed and cannot be recovered.</li>
+                                <li>If a user forgets their password, an admin can reset it by editing the user account.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light text-center py-4 mt-5">
+        <p class="text-muted mb-0">SEB Pages - Safe Exam Browser Management System</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validate password match
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match. Please enter matching passwords.');
+                document.getElementById('confirm_password').focus();
+                return false;
+            }
+            
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long.');
+                document.getElementById('password').focus();
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Attempts - {{ exam.get('custom_name', 'Exam') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #007bff;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+        .back-button {
+            text-decoration: none;
+            color: #007bff;
+            padding: 0.5rem 1rem;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .back-button:hover {
+            background: #007bff;
+            color: white;
+        }
+        .exam-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+        .exam-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        .exam-info p {
+            margin: 0.25rem 0;
+            color: #6c757d;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card h4 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stat-card p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        .attempts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .attempts-table th {
+            background: #007bff;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        .attempts-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .attempts-table tr:hover {
+            background: #f8f9fa;
+        }
+        .access-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge-launch {
+            background: #28a745;
+            color: white;
+        }
+        .badge-tool {
+            background: #17a2b8;
+            color: white;
+        }
+        .no-attempts {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        .no-attempts i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .user-email {
+            color: #007bff;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="bi bi-clipboard-data"></i> Exam Attempts</h1>
+            <a href="{{ url_for('routes.index') }}" class="back-button">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="exam-info">
+            <h3>{{ exam.get('custom_name', 'Unnamed Exam') }}</h3>
+            <p><strong>Exam Key:</strong> {{ exam.get('exam_key', 'N/A') }}</p>
+            <p><strong>Exam ID:</strong> {{ exam_id }}</p>
+        </div>
+        
+        {% if attempts %}
+        <div class="stats-container">
+            <div class="stat-card">
+                <h4>{{ attempts|length }}</h4>
+                <p>Total Attempts</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h4>{{ attempts|selectattr('email')|map(attribute='email')|unique|list|length }}</h4>
+                <p>Unique Students</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <h4>{{ attempts|selectattr('access_type', 'equalto', 'exam_launch')|list|length }}</h4>
+                <p>Exam Launches</p>
+            </div>
+        </div>
+        
+        <h3 style="margin: 2rem 0 1rem 0;">Attempt History</h3>
+        <table class="attempts-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Access Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attempt in attempts %}
+                <tr>
+                    <td class="timestamp">
+                        {{ attempt.timestamp|replace('T', ' ')|truncate(19, True, '') }} UTC
+                    </td>
+                    <td>{{ attempt.name }}</td>
+                    <td class="user-email">{{ attempt.email }}</td>
+                    <td>
+                        {% if attempt.access_type == 'exam_launch' %}
+                            <span class="access-badge badge-launch">
+                                <i class="bi bi-play-circle"></i> Exam Launch
+                            </span>
+                        {% else %}
+                            <span class="access-badge badge-tool">
+                                <i class="bi bi-tool"></i> {{ attempt.access_type.replace('tool_access:', '') }}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-attempts">
+            <i class="bi bi-inbox"></i>
+            <h3>No attempts recorded yet</h3>
+            <p>Students who access this exam will appear here</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

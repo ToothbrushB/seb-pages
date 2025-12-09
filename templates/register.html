@@ -10,12 +10,12 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('routes.index') }}">
                 <i class="bi bi-lock-fill"></i> SEB Pages
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                <a class="nav-link active" href="{{ url_for('register') }}">Register Exam</a>
+                <a class="nav-link" href="{{ url_for('routes.index') }}">Home</a>
+                <a class="nav-link active" href="{{ url_for('routes.register') }}">Register Exam</a>
             </div>
         </div>
     </nav>
@@ -44,7 +44,7 @@
                             Exam ID (UUID) and Exam Key (4 random words) will be automatically generated for security.
                         </div>
 
-                        <form method="POST" action="{{ url_for('register') }}">
+                        <form method="POST" action="{{ url_for('routes.register') }}">
                             <div class="mb-3">
                                 <label for="custom_name" class="form-label">Custom Exam Name (Optional)</label>
                                 <input type="text" class="form-control" id="custom_name" name="custom_name" 
@@ -103,7 +103,7 @@
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                                <a href="{{ url_for('routes.index') }}" class="btn btn-secondary">
                                     <i class="bi bi-x-circle"></i> Cancel
                                 </a>
                                 <button type="submit" class="btn btn-primary">

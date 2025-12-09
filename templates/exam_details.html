@@ -19,12 +19,12 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('routes.index') }}">
                 <i class="bi bi-lock-fill"></i> SEB Pages
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                <a class="nav-link" href="{{ url_for('register') }}">Register Exam</a>
+                <a class="nav-link" href="{{ url_for('routes.index') }}">Home</a>
+                <a class="nav-link" href="{{ url_for('routes.register') }}">Register Exam</a>
             </div>
         </div>
     </nav>
@@ -132,15 +132,75 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{{ url_for('exam', exam_id=exam_id) }}" class="btn btn-success" target="_blank">
+                            <a href="{{ url_for('routes.exam', exam_id=exam_id) }}" class="btn btn-success" target="_blank">
                                 <i class="bi bi-box-arrow-up-right"></i> Open Exam
                             </a>
-                            <a href="{{ url_for('edit_exam', exam_id=exam_id) }}" class="btn btn-warning">
+                            <a href="{{ url_for('routes.edit_exam', exam_id=exam_id) }}" class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Edit Exam
                             </a>
-                            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <a href="{{ url_for('routes.index') }}" class="btn btn-primary">
                                 <i class="bi bi-house"></i> Back to Home
                             </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-Time Student Monitoring Panel -->
+                <div class="card shadow-lg mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0"><i class="bi bi-broadcast"></i> Real-Time Student Monitoring</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Monitor active students in real-time and send messages or control their exam session.
+                        </div>
+
+                        <!-- Connection Status -->
+                        <div class="mb-3">
+                            <span id="connectionStatus" class="badge bg-secondary">
+                                <i class="bi bi-circle-fill"></i> Connecting...
+                            </span>
+                        </div>
+
+                        <!-- Active Students List -->
+                        <h5><i class="bi bi-people"></i> Active Students (<span id="studentCount">0</span>)</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Email</th>
+                                        <th>Current Tool</th>
+                                        <th>Window Focus</th>
+                                        <th>Last Activity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsList">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="bi bi-hourglass-split"></i> Waiting for students to connect...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Teacher Controls -->
+                        <h5><i class="bi bi-broadcast-pin"></i> Teacher Controls</h5>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <button class="btn btn-primary w-100" onclick="openMessageModal()">
+                                    <i class="bi bi-chat-square-text"></i> Send Message to All Students
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-danger w-100" onclick="endExamForAll()">
+                                    <i class="bi bi-stop-circle"></i> End Exam for All
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,8 +208,310 @@
         </div>
     </div>
 
+    <!-- Message Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-chat-square-text"></i> Send Message to Students</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="messageTitle" class="form-label">Message Title</label>
+                        <input type="text" class="form-control" id="messageTitle" 
+                               placeholder="e.g., Important Announcement" value="Message from Teacher">
+                    </div>
+                    <div class="mb-3">
+                        <label for="messageContent" class="form-label">Message Content</label>
+                        <textarea class="form-control" id="messageContent" rows="4" 
+                                  placeholder="Enter your message here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="sendMessage()">
+                        <i class="bi bi-send"></i> Send Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
+        const examId = '{{ exam_id }}';
+        let socket;
+        let messageModal;
+        let activeStudents = {};
+
+        // Initialize Socket.IO connection
+        document.addEventListener('DOMContentLoaded', function() {
+            messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+            initializeWebSocket();
+        });
+
+        function initializeWebSocket() {
+            socket = io();
+
+            socket.on('connect', function() {
+                updateConnectionStatus(true);
+                // Join as teacher for this exam
+                socket.emit('join_exam_teacher', { exam_id: examId });
+            });
+
+            socket.on('disconnect', function() {
+                updateConnectionStatus(false);
+            });
+
+            socket.on('current_students', function(data) {
+                activeStudents = {};
+                data.students.forEach(student => {
+                    activeStudents[student.session_id] = student;
+                });
+                updateStudentsList();
+            });
+
+            socket.on('student_joined', function(data) {
+                if (data.exam_id === examId) {
+                    activeStudents[data.session_id] = {
+                        user_info: data.user_info,
+                        focused_window: data.window_type,
+                        last_ping: new Date().toISOString(),
+                        window_type: data.window_type
+                    };
+                    updateStudentsList();
+                }
+            });
+
+            socket.on('student_disconnected', function(data) {
+                if (data.exam_id === examId) {
+                    delete activeStudents[data.session_id];
+                    updateStudentsList();
+                }
+            });
+
+            socket.on('student_focus_changed', function(data) {
+                if (data.exam_id === examId && activeStudents[data.session_id]) {
+                    activeStudents[data.session_id].focused_window = data.focused_window;
+                    updateStudentsList();
+                }
+            });
+
+            socket.on('message_sent', function(data) {
+                if (data.success) {
+                    messageModal.hide();
+                    document.getElementById('messageContent').value = '';
+                    showAlert('Message sent successfully to all students!', 'success');
+                }
+            });
+
+            socket.on('redirect_sent', function(data) {
+                if (data.success) {
+                    showAlert('End exam command sent to all students!', 'success');
+                }
+            });
+
+            // Request student list every 10 seconds
+            setInterval(() => {
+                if (socket.connected) {
+                    socket.emit('get_active_students', { exam_id: examId });
+                }
+            }, 10000);
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.className = 'badge bg-success';
+                statusEl.innerHTML = '<i class="bi bi-circle-fill"></i> Connected';
+            } else {
+                statusEl.className = 'badge bg-danger';
+                statusEl.innerHTML = '<i class="bi bi-circle-fill"></i> Disconnected';
+            }
+        }
+
+        function updateStudentsList() {
+            const tbody = document.getElementById('studentsList');
+            const studentCount = document.getElementById('studentCount');
+            const students = Object.values(activeStudents);
+            
+            studentCount.textContent = students.length;
+
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="bi bi-hourglass-split"></i> Waiting for students to connect...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = students.map(student => {
+                const focusBadge = getFocusBadge(student.focused_window);
+                const toolName = student.tool_name || 'Launcher';
+                const lastPing = student.last_ping ? new Date(student.last_ping) : null;
+                const lastKeypress = student.last_keypress ? new Date(student.last_keypress) : null;
+                const lastActivity = getLatestActivity(lastPing, lastKeypress);
+                const lastActivityStr = formatTime(lastActivity);
+                const needsHelp = student.needs_help || false;
+                const helpBadge = needsHelp ? '<span class="badge bg-danger ms-2"><i class="bi bi-hand-raised"></i> Help</span>' : '';
+                const rowClass = needsHelp ? 'class="table-warning"' : '';
+                const sessionId = student.session_id || '';
+                const name = student.user_info.name || 'Anonymous';
+                
+                return `
+                    <tr ${rowClass}>
+                        <td><i class="bi bi-person-fill"></i> ${name}${helpBadge}</td>
+                        <td>${student.user_info.email || 'N/A'}</td>
+                        <td><span class="badge bg-info"><i class="bi bi-app"></i> ${toolName}</span></td>
+                        <td>${focusBadge}</td>
+                        <td><small class="text-muted">${lastActivityStr}</small></td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-primary" onclick="sendIndividualMessage('${sessionId}', '${name}')" title="Send Message">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="endIndividualExam('${sessionId}', '${name}')" title="End Exam">
+                                    <i class="bi bi-stop-circle"></i>
+                                </button>
+                                ${needsHelp ? `
+                                <button class="btn btn-outline-success" onclick="clearHelpFlag('${sessionId}', '${name}')" title="Clear Help Request">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function getLatestActivity(lastPing, lastKeypress) {
+            if (!lastPing && !lastKeypress) return null;
+            if (!lastPing) return lastKeypress;
+            if (!lastKeypress) return lastPing;
+            return lastPing > lastKeypress ? lastPing : lastKeypress;
+        }
+
+        function getFocusBadge(focusedWindow) {
+            const badges = {
+                'launcher': '<span class="badge bg-success"><i class="bi bi-grid"></i> Launcher</span>',
+                'app': '<span class="badge bg-primary"><i class="bi bi-app"></i> Tool</span>',
+                'other': '<span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Other Window</span>',
+                'unknown': '<span class="badge bg-secondary"><i class="bi bi-question"></i> Unknown</span>'
+            };
+            return badges[focusedWindow] || badges['unknown'];
+        }
+
+        function formatTime(date) {
+            if (!date) return 'Never';
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000); // seconds
+
+            if (diff < 60) return `${diff}s ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            return date.toLocaleTimeString();
+        }
+        
+        function sendIndividualMessage(sessionId, name) {
+            const message = prompt(`Enter message to send to ${name}:`);
+            if (!message) return;
+            
+            socket.emit('teacher_send_individual_message', {
+                exam_id: examId,
+                session_id: sessionId,
+                title: 'Private Message from Teacher',
+                message: message
+            });
+            
+            socket.once('individual_message_sent', function(data) {
+                if (data.success) {
+                    showAlert(`Message sent to ${name}!`, 'success');
+                } else {
+                    showAlert(`Failed to send message: ${data.message}`, 'danger');
+                }
+            });
+        }
+        
+        function endIndividualExam(sessionId, name) {
+            if (!confirm(`End exam for ${name}? This will redirect them to the quit page.`)) {
+                return;
+            }
+            
+            socket.emit('teacher_redirect_individual', {
+                exam_id: examId,
+                session_id: sessionId
+            });
+            
+            socket.once('individual_redirect_sent', function(data) {
+                if (data.success) {
+                    showAlert(`Exam ended for ${name}!`, 'success');
+                } else {
+                    showAlert(`Failed to end exam: ${data.message}`, 'danger');
+                }
+            });
+        }
+        
+        function clearHelpFlag(sessionId, name) {
+            socket.emit('teacher_clear_help_flag', {
+                exam_id: examId,
+                session_id: sessionId
+            });
+            
+            if (activeStudents[sessionId]) {
+                activeStudents[sessionId].needs_help = false;
+                updateStudentsList();
+            }
+            
+            showAlert(`Help flag cleared for ${name}`, 'info');
+        }
+
+        function openMessageModal() {
+            messageModal.show();
+        }
+
+        function sendMessage() {
+            const title = document.getElementById('messageTitle').value.trim();
+            const message = document.getElementById('messageContent').value.trim();
+
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            socket.emit('teacher_send_message', {
+                exam_id: examId,
+                title: title || 'Message from Teacher',
+                message: message
+            });
+        }
+
+        function endExamForAll() {
+            if (!confirm('This will redirect all students to the exam quit page. Are you sure?')) {
+                return;
+            }
+
+            socket.emit('teacher_redirect_students', {
+                exam_id: examId
+            });
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
         function copyToClipboard(elementId, button) {
             const input = document.getElementById(elementId);
             input.select();

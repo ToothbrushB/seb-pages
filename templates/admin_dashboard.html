@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SEB Pages</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body { background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .section-title { margin-top: 2rem; margin-bottom: 1rem; color: #333; }
+        .table th, .table td { vertical-align: middle; }
+        .user-role-admin { color: #d63384; font-weight: bold; }
+        .user-role-teacher { color: #0d6efd; font-weight: bold; }
+        .user-role-student { color: #198754; font-weight: bold; }
+        .badge-key { font-size: 0.95em; }
+        .actions-btns .btn { margin-right: 0.25rem; }
+        .creator-cell { font-size: 0.95em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4"><i class="bi bi-shield-lock"></i> Admin Dashboard</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title"><i class="bi bi-people"></i> Users</h2>
+            <a href="{{ url_for('routes.admin_create_user') }}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add User</a>
+        </div>
+        <div class="table-responsive mb-5">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email/Username</th>
+                        <th>Role</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for username, user in users.items() %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email if user.email else username }}</td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                                <span class="user-role-admin">Admin</span>
+                            {% elif user.role == 'teacher' %}
+                                <span class="user-role-teacher">Teacher</span>
+                            {% else %}
+                                <span class="user-role-student">Student</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at if user.created_at else '-' }}</td>
+                        <td>{{ user.last_login if user.last_login else '-' }}</td>
+                        <td class="actions-btns">
+                            <a href="{{ url_for('routes.admin_edit_user', username=username) }}" class="btn btn-sm btn-warning" title="Edit User"><i class="bi bi-pencil"></i> Edit</a>
+                            <form method="POST" action="{{ url_for('routes.admin_delete_user', username=username) }}" style="display:inline;" onsubmit="return confirm('Delete user {{ user.name }}?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete User"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title"><i class="bi bi-clipboard-check"></i> Exams</h2>
+            <a href="{{ url_for('routes.register') }}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Exam</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Exam Key</th>
+                        <th>Custom Name</th>
+                        <th>Creator</th>
+                        <th>BEK</th>
+                        <th>CK</th>
+                        <th>UA</th>
+                        <th>Apps</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam_id, exam in exams.items() %}
+                    <tr>
+                        <td><code class="text-primary fw-bold">{{ exam.exam_key }}</code></td>
+                        <td>{{ exam.custom_name if exam.custom_name else '<em class="text-muted">Not set</em>' | safe }}</td>
+                        <td class="creator-cell">
+                            {% set creator = users[exam.user_id] if exam.user_id in users else None %}
+                            {% if creator %}
+                                {{ creator.name }}<br><span class="text-muted">{{ creator.email if creator.email else exam.user_id }}</span>
+                            {% else %}
+                                <span class="text-muted">{{ exam.user_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-key bg-{{ 'success' if exam.beks|length>0 else 'secondary' }}">BEK</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-key bg-{{ 'success' if exam.ck else 'secondary' }}">CK</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-key bg-{{ 'success' if exam.ua else 'secondary' }}">UA</span>
+                        </td>
+                        <td><span class="badge bg-primary">{{ exam.tools|length if exam.tools else 0 }} tool(s)</span></td>
+                        <td class="actions-btns">
+                            <a href="{{ url_for('routes.exam_details', exam_id=exam_id) }}" class="btn btn-sm btn-success" title="Open Exam"><i class="bi bi-box-arrow-up-right"></i> Open</a>
+                            <a href="{{ url_for('routes.edit_exam', exam_id=exam_id) }}" class="btn btn-sm btn-warning" title="Edit Exam"><i class="bi bi-pencil"></i> Edit</a>
+                            <form method="POST" action="{{ url_for('routes.delete_exam', exam_id=exam_id) }}" style="display:inline;" onsubmit="return confirm('Delete exam {{ exam.custom_name }}?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete Exam"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
