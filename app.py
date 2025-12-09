@@ -40,6 +40,11 @@ def save_exams(exams):
     with open(EXAM_DB_PATH, 'w') as f:
         json.dump(exams, f, indent=2)
 
+# Save users to JSON file
+def save_users(users):
+    with open(USERS_DB_PATH, 'w') as f:
+        json.dump(users, f, indent=2)
+
 # Word list for generating memorable exam keys (expanded for more combinations)
 WORD_LIST = [
     'alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel',
@@ -90,6 +95,22 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Admin-only decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please login to access this page', 'error')
+            return redirect(url_for('login', next=request.url))
+        
+        username = session.get('username')
+        if username not in USERS or USERS[username].get('role') != 'admin':
+            flash('You do not have permission to access this page', 'error')
+            return redirect(url_for('index'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -103,6 +124,7 @@ def login():
                 session['username'] = username
                 session['user_id'] = user.get('user_id')
                 session['name'] = user.get('name', username)
+                session['role'] = user.get('role', 'teacher')
                 flash(f'Welcome, {user.get("name", username)}!', 'success')
                 
                 # Redirect to next page if specified, otherwise to index
@@ -126,6 +148,7 @@ def logout():
     session.pop('username', None)
     session.pop('user_id', None)
     session.pop('name', None)
+    session.pop('role', None)
     flash('You have been logged out', 'success')
     return redirect(url_for('login'))
 
@@ -133,9 +156,13 @@ def logout():
 @login_required
 def index():
     """Home page showing all registered exams"""
-    # Filter exams by current user
-    user_id = session.get('user_id')
-    user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
+    # Admins see all exams, teachers see only their own
+    if session.get('role') == 'admin':
+        user_exams = EXAMS
+    else:
+        user_id = session.get('user_id')
+        user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
+    
     return render_template('index.html', exams=user_exams)
 
 @app.route('/hash_generator')
@@ -279,8 +306,8 @@ def edit_exam(exam_id):
         flash(f'Exam "{exam_id}" not found', 'error')
         return redirect(url_for('index'))
     
-    # Check ownership
-    if EXAMS[exam_id].get('user_id') != session.get('user_id'):
+    # Check ownership (admins can edit any exam, teachers can only edit their own)
+    if session.get('role') != 'admin' and EXAMS[exam_id].get('user_id') != session.get('user_id'):
         flash('You do not have permission to edit this exam', 'error')
         return redirect(url_for('index'))
     
@@ -335,16 +362,16 @@ def edit_exam(exam_id):
 def delete_exam(exam_id):
     """Delete an exam"""
     if exam_id in EXAMS:
-        # Check ownership
-        if EXAMS[exam_id].get('user_id') != session.get('user_id'):
+        # Check ownership (admins can delete any exam, teachers can only delete their own)
+        if session.get('role') != 'admin' and EXAMS[exam_id].get('user_id') != session.get('user_id'):
             flash('You do not have permission to delete this exam', 'error')
             return redirect(url_for('index'))
         
         del EXAMS[exam_id]
         save_exams(EXAMS)
-        flash(f'Exam "{exam_id}" deleted successfully!', 'success')
+        flash(f'Exam deleted successfully!', 'success')
     else:
-        flash(f'Exam "{exam_id}" not found', 'error')
+        flash(f'Exam not found', 'error')
     
     return redirect(url_for('index'))
 
@@ -375,10 +402,111 @@ def exam_details(exam_id):
 @login_required
 def api_exams():
     """API endpoint to get all exams as JSON"""
-    # Filter exams by current user
-    user_id = session.get('user_id')
-    user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
-    return jsonify(user_exams)
+    # Admins see all exams, teachers see only their own
+    if session.get('role') == 'admin':
+        return jsonify(EXAMS)
+    else:
+        user_id = session.get('user_id')
+        user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
+        return jsonify(user_exams)
+
+# Admin Dashboard Routes
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    """Admin dashboard showing all users and exams"""
+    return render_template('admin_dashboard.html', users=USERS, exams=EXAMS)
+
+@app.route('/admin/users/create', methods=['GET', 'POST'])
+@admin_required
+def admin_create_user():
+    """Create a new user account"""
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        name = request.form.get('name', '').strip()
+        role = request.form.get('role', 'teacher')
+        
+        # Validation
+        if not username or not password or not name:
+            flash('Username, password, and name are required', 'error')
+            return redirect(url_for('admin_create_user'))
+        
+        if username in USERS:
+            flash(f'Username "{username}" already exists', 'error')
+            return redirect(url_for('admin_create_user'))
+        
+        if role not in ['admin', 'teacher']:
+            flash('Invalid role selected', 'error')
+            return redirect(url_for('admin_create_user'))
+        
+        # Create user
+        USERS[username] = {
+            'user_id': str(uuid.uuid4()),
+            'password_hash': generate_password_hash(password),
+            'name': name,
+            'role': role
+        }
+        
+        save_users(USERS)
+        flash(f'User "{username}" created successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('admin_create_user.html')
+
+@app.route('/admin/users/<username>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_user(username):
+    """Edit an existing user account"""
+    if username not in USERS:
+        flash('User not found', 'error')
+        return redirect(url_for('admin_dashboard'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        role = request.form.get('role', 'teacher')
+        new_password = request.form.get('new_password', '').strip()
+        
+        # Validation
+        if not name:
+            flash('Name is required', 'error')
+            return redirect(url_for('admin_edit_user', username=username))
+        
+        if role not in ['admin', 'teacher']:
+            flash('Invalid role selected', 'error')
+            return redirect(url_for('admin_edit_user', username=username))
+        
+        # Update user
+        USERS[username]['name'] = name
+        USERS[username]['role'] = role
+        
+        # Update password if provided
+        if new_password:
+            USERS[username]['password_hash'] = generate_password_hash(new_password)
+        
+        save_users(USERS)
+        flash(f'User "{username}" updated successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('admin_edit_user.html', username=username, user=USERS[username])
+
+@app.route('/admin/users/<username>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(username):
+    """Delete a user account"""
+    if username not in USERS:
+        flash('User not found', 'error')
+        return redirect(url_for('admin_dashboard'))
+    
+    # Prevent deleting self
+    if username == session.get('username'):
+        flash('You cannot delete your own account', 'error')
+        return redirect(url_for('admin_dashboard'))
+    
+    del USERS[username]
+    save_users(USERS)
+    flash(f'User "{username}" deleted successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
