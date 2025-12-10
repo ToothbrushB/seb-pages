@@ -84,7 +84,7 @@
                                     <i class="bi bi-plus-circle"></i> Add BEK
                                 </button>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="exam_password" class="form-label">Exam Password</label>
                                 <input type="password" class="form-control" id="exam_password" name="exam_password" 
@@ -97,6 +97,17 @@
                                 <input type="password" class="form-control" id="quit_password" name="quit_password" 
                                        placeholder="Enter new quit password or leave blank to keep existing">
                                 <div class="form-text">Leave blank to keep existing. Changing this will regenerate the .seb file.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="enabled" name="enabled" 
+                                           {{ 'checked' if exam.enabled is not defined or exam.enabled else '' }}>
+                                    <label class="form-check-label" for="enabled">
+                                        <strong>Enable Exam</strong> - Allow students to access this exam
+                                    </label>
+                                    <div class="form-text">Uncheck to disable student access (useful for exams not yet started or already completed)</div>
+                                </div>
                             </div>
 
                             <div class="mb-3">

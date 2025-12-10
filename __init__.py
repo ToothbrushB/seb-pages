@@ -28,3 +28,7 @@ app.register_blueprint(routes_bp)
 # Initialize WebSocket event handlers
 from websocket_events import init_socketio
 init_socketio(socketio)
+
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')

@@ -31,6 +31,7 @@ def generate_seb_file(exam_id, exam_password, quit_password, user_agent):
     config['browserUserAgentWinTouchModeCustom'] = f"[{user_agent}]"
     config['browserUserAgentWinTouchModeIPad'] = f"[{user_agent}]"
     
+    config['quitURL'] = url_for('routes.exam_quit', exam_id=exam_id, _external=True)
     # Hash quit password with SHA256
     hashed_quit = hashlib.sha256(quit_password.encode('utf-8')).hexdigest()
     config['hashedQuitPassword'] = hashed_quit
@@ -64,6 +65,12 @@ def exam(exam_id):
         return redirect(url_for('routes.index'))
     
     exam_data = EXAMS[exam_id]
+    
+    # Check if exam is enabled (default to True for backwards compatibility)
+    if not exam_data.get('enabled', True):
+        return render_template('exam_quit.html', 
+                             message='This exam is currently disabled',
+                             reason='The exam has been disabled by the instructor. Please contact your instructor for more information.')
     
     if 'google_id' in session or 'email' in session:
         user_info = {
@@ -216,7 +223,8 @@ def register():
             'ck': config_key,
             'ua': ua,
             'tools': tools,
-            'seb_file': f'{exam_id}.seb'
+            'seb_file': f'{exam_id}.seb',
+            'enabled': request.form.get('enabled') == 'on'
         }
         
         save_exams(EXAMS)
@@ -332,6 +340,29 @@ def download_seb(exam_id):
     
     return send_file(seb_path, as_attachment=True, download_name=download_name)
 
+@routes_bp.route('/exam/<exam_id>/download/public')
+def download_seb_public(exam_id):
+    """Public download endpoint for students (no login required)"""
+    if exam_id not in EXAMS:
+        return "Exam not found", 404
+    
+    exam = EXAMS[exam_id]
+    
+    # Check if exam is enabled (default to True for backwards compatibility)
+    if not exam.get('enabled', True):
+        return "This exam is currently disabled", 403
+    seb_file = exam.get('seb_file', f'{exam_id}.seb')
+    seb_path = os.path.join(os.path.dirname(__file__), 'seb_files', seb_file)
+    
+    if not os.path.exists(seb_path):
+        return "SEB file not found", 404
+    
+    # Use custom name or exam key as filename
+    download_name = exam.get('custom_name', exam.get('exam_key', exam_id))
+    download_name = download_name.replace(' ', '_') + '.seb'
+    
+    return send_file(seb_path, as_attachment=True, download_name=download_name)
+
 @routes_bp.route('/delete/<exam_id>', methods=['POST'])
 @login_required
 def delete_exam(exam_id):
@@ -342,6 +373,7 @@ def delete_exam(exam_id):
             return redirect(url_for('routes.index'))
         
         del EXAMS[exam_id]
+        del EXAM_ATTEMPTS[exam_id]
         save_exams(EXAMS)
         flash(f'Exam deleted successfully!', 'success')
     else:
@@ -405,6 +437,40 @@ def api_exams():
         user_id = session.get('user_id')
         user_exams = {exam_id: exam for exam_id, exam in EXAMS.items() if exam.get('user_id') == user_id}
         return jsonify(user_exams)
+
+@routes_bp.route('/api/exam-by-key')
+def api_exam_by_key():
+    """API endpoint to look up exam by 4-word key (public access for students)"""
+    exam_key = request.args.get('key', '').strip().upper()
+    
+    if not exam_key:
+        return jsonify({'success': False, 'error': 'No exam key provided'})
+    
+    # Find exam with matching key
+    exam_id = None
+    for eid, exam in EXAMS.items():
+        if exam.get('exam_key', '').upper() == exam_key:
+            exam_id = eid
+            break
+    
+    if not exam_id:
+        return jsonify({'success': False, 'error': 'Exam not found'})
+    
+    # Check if exam is enabled (default to True for backwards compatibility)
+    if not EXAMS[exam_id].get('enabled', True):
+        return jsonify({'success': False, 'error': 'This exam is currently disabled'})
+    
+    # Return download URLs
+    download_url = url_for('routes.download_seb_public', exam_id=exam_id, _external=True)
+    download_path = url_for('routes.download_seb_public', exam_id=exam_id)
+    
+    return jsonify({
+        'success': True,
+        'exam_id': exam_id,
+        'exam_key': exam_key,
+        'download_url': download_url,
+        'download_path': download_path
+    })
 
 @routes_bp.route('/admin')
 @admin_required
@@ -496,3 +562,4 @@ def admin_delete_user(username):
     save_users(USERS)
     flash(f'User "{username}" deleted successfully!', 'success')
     return redirect(url_for('routes.admin_dashboard'))
+

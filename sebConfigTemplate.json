@@ -1415,7 +1415,7 @@
         }
     ],
     "quitURL": "",
-    "quitURLConfirm": true,
+    "quitURLConfirm": false,
     "quitURLRestart": false,
     "removeLocalStorage": false,
     "restartExamPasswordProtected": true,

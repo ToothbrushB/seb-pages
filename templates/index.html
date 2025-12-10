@@ -29,6 +29,13 @@
                             <i class="bi bi-plus-circle"></i> Register Exam
                         </a>
                     </li>
+                    {% if session['role'] == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('routes.admin_dashboard') }}">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <span class="nav-link text-light">
                             <i class="bi bi-person-circle"></i> {{ session.get('name', session.get('username', 'User')) }}
@@ -107,6 +114,15 @@
                                                         title="Copy Exam Key">
                                                     <i class="bi bi-clipboard"></i>
                                                 </button>
+                                                {% if not exam.enabled|default(True) %}
+                                                <span class="badge bg-danger ms-2" title="Exam is disabled for students">
+                                                    <i class="bi bi-x-circle"></i> Disabled
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-success ms-2" title="Exam is enabled for students">
+                                                    <i class="bi bi-check-circle"></i> Enabled
+                                                </span>
+                                                {% endif %}
                                             </td>
                                             <td>{{ exam.custom_name if exam.custom_name else '<em class="text-muted">Not set</em>' | safe }}</td>
                                             <td><span class="badge bg-primary">{{ exam.tools|length if exam.tools else (exam.apps|length if exam.apps else 0) }} tool(s)</span></td>

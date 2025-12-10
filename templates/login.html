@@ -10,8 +10,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+            max-width: 500px;
+            margin: 50px auto;
             padding: 2rem;
             background: white;
             border-radius: 8px;
@@ -131,6 +131,66 @@
             
             <button type="submit" class="login-button">Login</button>
         </form>
+        
+        <div class="divider">
+            <span>STUDENT ACCESS</span>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-3">
+                    <i class="bi bi-download"></i> Download SEB Config File
+                </h5>
+                <div class="form-group">
+                    <label for="examKey">Enter 4-Word Exam Key</label>
+                    <input type="text" 
+                           id="examKey" 
+                           class="form-control text-uppercase" 
+                           placeholder="e.g., ALPHA-BRAVO-CHARLIE-DELTA"
+                           oninput="checkExamKey(this.value)">
+                    <small class="text-muted">Format: WORD-WORD-WORD-WORD</small>
+                </div>
+                
+                <div id="sebDownloadSection" style="display: none;" class="mt-3">
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle"></i> Exam found!
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">SEB Protocol Link (for browsers)</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="sebsLink" 
+                                   class="form-control font-monospace small" 
+                                   readonly>
+                            <button class="btn btn-outline-secondary" 
+                                    onclick="copyToClipboard('sebsLink', this)">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Click this link in a browser to auto-open with SEB</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a id="downloadBtn" 
+                           class="btn btn-primary btn-lg" 
+                           download>
+                            <i class="bi bi-download"></i> Download .seb File
+                        </a>
+                        <a id="sebsLinkBtn" 
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-up-right"></i> Open with SEB Protocol
+                        </a>
+                    </div>
+                </div>
+                
+                <div id="sebErrorSection" style="display: none;" class="mt-3">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Exam not found. Please check your exam key.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -157,6 +217,77 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred during Google Sign-In');
+            });
+        }
+        
+        let checkTimeout = null;
+        
+        function checkExamKey(key) {
+            // Clear previous timeout
+            if (checkTimeout) {
+                clearTimeout(checkTimeout);
+            }
+            
+            // Hide sections
+            document.getElementById('sebDownloadSection').style.display = 'none';
+            document.getElementById('sebErrorSection').style.display = 'none';
+            
+            // Check if key matches pattern (4 words separated by hyphens)
+            key = key.trim().toUpperCase();
+            if (!key || key.split('-').length !== 4) {
+                return;
+            }
+            
+            // Debounce API call
+            checkTimeout = setTimeout(() => {
+                fetch(`/api/exam-by-key?key=${encodeURIComponent(key)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show download section
+                            const downloadSection = document.getElementById('sebDownloadSection');
+                            const errorSection = document.getElementById('sebErrorSection');
+                            
+                            // Build URLs
+                            const downloadUrl = data.download_url;
+                            const sebsUrl = `sebs://${window.location.host}${data.download_path}`;
+                            
+                            // Update elements
+                            document.getElementById('sebsLink').value = sebsUrl;
+                            document.getElementById('downloadBtn').href = downloadUrl;
+                            document.getElementById('sebsLinkBtn').href = sebsUrl;
+                            
+                            downloadSection.style.display = 'block';
+                            errorSection.style.display = 'none';
+                        } else {
+                            // Show error
+                            document.getElementById('sebDownloadSection').style.display = 'none';
+                            document.getElementById('sebErrorSection').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking exam key:', error);
+                        document.getElementById('sebErrorSection').style.display = 'block';
+                    });
+            }, 500);
+        }
+        
+        function copyToClipboard(elementId, button) {
+            const input = document.getElementById(elementId);
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile devices
+            
+            navigator.clipboard.writeText(input.value).then(() => {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-secondary');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHtml;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-secondary');
+                }, 2000);
             });
         }
     </script>

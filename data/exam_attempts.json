@@ -1,94 +1,12 @@
 {
-  "fb5069ed-6671-4d14-94b9-da3be137ffae": [
+  "a3b82491-d598-45ed-a730-6f8ee9d82104": [
     {
-      "timestamp": "2025-12-09T05:06:49.308552",
+      "timestamp": "2025-12-10T02:22:20.660755",
       "google_id": "anonymous",
       "email": "",
       "name": "Administrator",
       "access_type": "exam_launch",
-      "attempt_id": "d9c9b77f-b5ea-421b-bf14-86bcd7550648"
-    },
-    {
-      "timestamp": "2025-12-09T05:07:18.674721",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "tool_access:Desmos Graphing Calculator",
-      "attempt_id": "0979501c-34dc-49f2-83ee-34f561fad525"
-    },
-    {
-      "timestamp": "2025-12-09T05:27:54.221826",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "exam_launch",
-      "attempt_id": "5be57848-af40-4381-a3ed-bb6754cce55b"
-    },
-    {
-      "timestamp": "2025-12-09T05:27:59.603778",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "tool_access:Desmos Graphing Calculator",
-      "attempt_id": "6584e97a-ae4a-481a-8812-1c909dd9ba08"
-    },
-    {
-      "timestamp": "2025-12-09T05:28:09.132948",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "tool_access:Desmos Graphing Calculator",
-      "attempt_id": "cadb9981-e3a9-4ae5-8ff8-cb83f83d7e02"
-    },
-    {
-      "timestamp": "2025-12-09T05:29:38.281610",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "exam_launch",
-      "attempt_id": "55f58302-34a8-4f44-a482-13f3508a5f18"
-    }
-  ],
-  "3df77698-2ca3-4a23-ab8d-4413ef9e4d8a": [
-    {
-      "timestamp": "2025-12-09T18:31:40.233812",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "exam_launch",
-      "attempt_id": "f4371da8-5bfd-40d6-8e71-c2bc7eb3ef2d"
-    },
-    {
-      "timestamp": "2025-12-09T18:31:41.262240",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "tool_access:APCR",
-      "attempt_id": "52b65dcf-6bd6-4f1e-8a46-e35de8906aac"
-    },
-    {
-      "timestamp": "2025-12-09T18:31:53.477029",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "tool_access:APCR",
-      "attempt_id": "330d93ae-effe-497c-871e-d9c1f9974715"
-    },
-    {
-      "timestamp": "2025-12-09T18:32:55.787056",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "exam_launch",
-      "attempt_id": "7f43257b-3737-40a0-8a46-09f85a301c00"
-    },
-    {
-      "timestamp": "2025-12-09T18:37:41.453055",
-      "google_id": "anonymous",
-      "email": "",
-      "name": "Administrator",
-      "access_type": "exam_launch",
-      "attempt_id": "b15a25ff-2aa0-4a7d-8e2a-78bdd69ddd4d"
+      "attempt_id": "1412a055-c209-446c-bce7-b545b72f69df"
     }
   ]
 }

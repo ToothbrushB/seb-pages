@@ -1,37 +1,20 @@
 {
-  "3df77698-2ca3-4a23-ab8d-4413ef9e4d8a": {
-    "exam_key": "VIOLET-MATRIX-KINETIC-ECHO",
+  "a3b82491-d598-45ed-a730-6f8ee9d82104": {
+    "exam_key": "RADAR-HAWK-LIMA-MATRIX",
     "user_id": "834ff2f0-d722-40f7-abdf-9e436c5dd4a7",
     "custom_name": "",
     "beks": [],
-    "ck": "",
-    "ua": "",
+    "ck": "a0ad249e082667e826c451802791b225b22d937c8c8d096850b846f0bbd62104",
+    "ua": "6e66ff021f0204523778e9dfd973617c5ceef15d688eae885c455cefd79f72edc191e9feda7828278c9460d0fdbf7dc2da54955efe199976d34bf4deea9e7df72f24b942ca933238e404e8fa9073d55c647e9008704651ee8914ae135a9753493a006732",
     "tools": [
       {
-        "id": "8baf35d7-ee5c-45a9-9292-9113ddd18597",
-        "name": "APCR",
-        "url": "https://apclassroom.collegeboard.org/",
-        "icon": "bi-app",
-        "open_in_new_tab": true
-      }
-    ]
-  },
-  "082c87dc-2f6b-43f0-9be8-1c69aec5880b": {
-    "exam_key": "ORBIT-TITAN-PHOENIX-PAPA",
-    "user_id": "5d84ef95-c1c0-4015-b1da-d31c85901581",
-    "custom_name": "asdf",
-    "beks": [],
-    "ck": "af348587430c5b9c6eeeb37b23d4096626eaee412efb2e8650738d1bbf8b0b68",
-    "ua": "afe524faa83afd1609eb2a00c77a2c47f3fc44803dce36ccfef13ea02405fe01cf0742e956cd545dcd9da328cb631a554a7a573a0d10723e09ec01d24cf8c8019bfa3ba850da732f5b731cc69e6c9eb58ec49e76e42e3d2b3b601a649933ad87d619e982",
-    "tools": [
-      {
-        "id": "041767fd-bc77-4d4f-89aa-a0003bab24ad",
-        "name": "AP CR",
-        "url": "https://apclassroom.collegeboard.org/",
+        "id": "8632566c-7e8a-4cf1-ac04-cd32b28dc0e4",
+        "name": "Desmos Graphing Calculator",
+        "url": "https://www.desmos.com/testing/cb-sat-ap/graphing",
         "icon": "bi-graph-up",
-        "open_in_new_tab": true
+        "open_in_new_tab": false
       }
     ],
-    "seb_file": "082c87dc-2f6b-43f0-9be8-1c69aec5880b.seb"
+    "seb_file": "a3b82491-d598-45ed-a730-6f8ee9d82104.seb"
   }
 }
