@@ -10,6 +10,7 @@ app = Flask(__name__)
 # Configuration
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
 app.config['SECRET_KEY'] = app.secret_key
+app.jinja_env.globals.update(iter=iter, next=next) 
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')

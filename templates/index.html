@@ -121,6 +121,11 @@
                                                    title="Open exam details">
                                                     <i class="bi bi-box-arrow-up-right"></i> Open
                                                 </a>
+                                                <a href="{{ url_for('routes.download_seb', exam_id=exam_id) }}" 
+                                                   class="btn btn-sm btn-secondary"
+                                                   title="Download SEB config file">
+                                                    <i class="bi bi-download"></i> .seb
+                                                </a>
                                                 <a href="{{ url_for('routes.exam_attempts', exam_id=exam_id) }}" 
                                                    class="btn btn-sm btn-info"
                                                    title="View exam attempts">

@@ -59,6 +59,21 @@
                                 <div class="form-text">Friendly name for your reference.</div>
                             </div>
 
+
+                            <div class="mb-3">
+                                <label for="ck" class="form-label">Config Key (CK)</label>
+                                <input type="text" class="form-control font-monospace" id="ck" name="ck" 
+                                       value="{{ exam.ck }}" placeholder="Enter CK hash" disabled>
+                                <div class="form-text">SHA256 hash for SEB config key verification. Auto generated.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ua" class="form-label">User Agent (UA)</label>
+                                <input type="text" class="form-control font-monospace" id="ua" name="ua" 
+                                       value="{{ exam.ua }}" placeholder="Enter UA hash" disabled>
+                                <div class="form-text">SEB user agent, excluding []. Auto generated.</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Browser Exam Keys (BEK)</label>
                                 <div class="form-text mb-2">Add one or more Browser Exam Keys for this exam.</div>
@@ -69,19 +84,19 @@
                                     <i class="bi bi-plus-circle"></i> Add BEK
                                 </button>
                             </div>
-
+                            
                             <div class="mb-3">
-                                <label for="ck" class="form-label">Config Key (CK)</label>
-                                <input type="text" class="form-control font-monospace" id="ck" name="ck" 
-                                       value="{{ exam.ck }}" placeholder="Enter CK hash">
-                                <div class="form-text">SHA256 hash for SEB config key verification.</div>
+                                <label for="exam_password" class="form-label">Exam Password</label>
+                                <input type="password" class="form-control" id="exam_password" name="exam_password" 
+                                       placeholder="Enter new password or leave blank to keep existing">
+                                <div class="form-text">Leave blank to keep existing password. Changing this will regenerate the .seb file.</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="ua" class="form-label">User Agent (UA)</label>
-                                <input type="text" class="form-control font-monospace" id="ua" name="ua" 
-                                       value="{{ exam.ua }}" placeholder="Enter UA hash">
-                                <div class="form-text">SEB user agent, excluding [].</div>
+                                <label for="quit_password" class="form-label">Quit Password</label>
+                                <input type="password" class="form-control" id="quit_password" name="quit_password" 
+                                       placeholder="Enter new quit password or leave blank to keep existing">
+                                <div class="form-text">Leave blank to keep existing. Changing this will regenerate the .seb file.</div>
                             </div>
 
                             <div class="mb-3">
@@ -223,8 +238,6 @@
                 {% endfor %}
             {% elif exam.bek %}
                 addBEK('{{ exam.bek }}');
-            {% else %}
-                addBEK();
             {% endif %}
             
             // Load existing tools

@@ -132,6 +132,9 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('routes.download_seb', exam_id=exam_id) }}" class="btn btn-info">
+                                <i class="bi bi-download"></i> Download .seb File
+                            </a>
                             <a href="{{ url_for('routes.exam', exam_id=exam_id) }}" class="btn btn-success" target="_blank">
                                 <i class="bi bi-box-arrow-up-right"></i> Open Exam
                             </a>

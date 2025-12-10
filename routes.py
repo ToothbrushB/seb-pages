@@ -1,15 +1,44 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
-import hashlib, uuid
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
+import hashlib, uuid, json, plistlib
 from datetime import datetime
 from models import (EXAMS, EXAM_APPS, USERS, EXAM_ATTEMPTS, 
                     save_exams, save_users, log_exam_attempt)
 from utils import generate_exam_id, generate_exam_key, exam_id_exists, exam_key_exists
 from auth import login_required, admin_required
 from werkzeug.security import generate_password_hash
+from sebConfigUtils import encrypt_seb_config, generate_config_key, create_seb_from_json
 import os
 
 routes_bp = Blueprint('routes', __name__)
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID_HERE')
+
+def generate_seb_file(exam_id, exam_password, quit_password, user_agent):
+    """Generate a .seb config file for the exam"""
+    # Load template
+    template_path = os.path.join(os.path.dirname(__file__), 'sebConfigTemplate.json')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    
+    # Set startURL
+    exam_url = url_for('routes.exam', exam_id=exam_id, _external=True)
+    config['startURL'] = exam_url
+    
+    # Set user agent strings wrapped in []
+    config['browserUserAgent'] = f"[{user_agent}]"
+    config['browserUserAgentiOSCustom'] = f"[{user_agent}]"
+    config['browserUserAgentMacCustom'] = f"[{user_agent}]"
+    config['browserUserAgentWinDesktopModeCustom'] = f"[{user_agent}]"
+    config['browserUserAgentWinTouchModeCustom'] = f"[{user_agent}]"
+    config['browserUserAgentWinTouchModeIPad'] = f"[{user_agent}]"
+    
+    # Hash quit password with SHA256
+    hashed_quit = hashlib.sha256(quit_password.encode('utf-8')).hexdigest()
+    config['hashedQuitPassword'] = hashed_quit
+    
+    (seb_data, config_key) = create_seb_from_json(config, password=exam_password, debug=False)
+
+    
+    return (seb_data, config_key)
 
 @routes_bp.route('/')
 @login_required
@@ -122,9 +151,13 @@ def register():
     """Register a new exam"""
     if request.method == 'POST':
         beks = [b.strip() for b in request.form.getlist('bek[]') if b.strip()]
-        ck = request.form.get('ck', '').strip()
-        ua = request.form.get('ua', '').strip()
         custom_name = request.form.get('custom_name', '').strip()
+        exam_password = request.form.get('exam_password', '').strip()
+        quit_password = request.form.get('quit_password', '').strip()
+        
+        if not exam_password or not quit_password:
+            flash('Exam password and quit password are required', 'error')
+            return redirect(url_for('routes.register'))
         
         tool_names = request.form.getlist('tool_name[]')
         tool_urls = request.form.getlist('tool_url[]')
@@ -159,21 +192,37 @@ def register():
             flash('Failed to generate unique exam key. Please try again.', 'error')
             return redirect(url_for('routes.register'))
         
+        ua = os.urandom(100).hex()
+        # Generate SEB file
+        try:
+            (seb_data, config_key) = generate_seb_file(exam_id, exam_password, quit_password, ua)
+            
+            # Save SEB file to disk
+            seb_dir = os.path.join(os.path.dirname(__file__), 'seb_files')
+            os.makedirs(seb_dir, exist_ok=True)
+            seb_path = os.path.join(seb_dir, f'{exam_id}.seb')
+            
+            with open(seb_path, 'wb') as f:
+                f.write(seb_data)
+        except Exception as e:
+            flash(f'Failed to generate SEB file: {str(e)}', 'error')
+            return redirect(url_for('routes.register'))
+        
         EXAMS[exam_id] = {
             'exam_key': exam_key,
             'custom_name': custom_name,
             'user_id': session.get('user_id'),
             'beks': beks,
-            'ck': ck,
+            'ck': config_key,
             'ua': ua,
-            'tools': tools
+            'tools': tools,
+            'seb_file': f'{exam_id}.seb'
         }
         
         save_exams(EXAMS)
         
         flash(f'Exam registered successfully! Exam Key: {exam_key}', 'success')
         return redirect(url_for('routes.exam_details', exam_id=exam_id))
-    
     return render_template('register.html', exam_apps=EXAM_APPS)
 
 @routes_bp.route('/edit/<exam_id>', methods=['GET', 'POST'])
@@ -191,8 +240,11 @@ def edit_exam(exam_id):
     if request.method == 'POST':
         custom_name = request.form.get('custom_name', '').strip()
         beks = [b.strip() for b in request.form.getlist('bek[]') if b.strip()]
-        ck = request.form.get('ck', '').strip()
-        ua = request.form.get('ua', '').strip()
+        exam_password = request.form.get('exam_password', '').strip()
+        quit_password = request.form.get('quit_password', '').strip()
+        
+        # Regenerate SEB file if passwords provided
+        regenerate_seb = bool(exam_password and quit_password)
         
         tool_names = request.form.getlist('tool_name[]')
         tool_urls = request.form.getlist('tool_url[]')
@@ -216,14 +268,34 @@ def edit_exam(exam_id):
             flash('At least one tool must be added', 'error')
             return redirect(url_for('routes.edit_exam', exam_id=exam_id))
         
+        # Regenerate SEB file if passwords were provided
+        ua = EXAMS[exam_id].get('ua', os.urandom(100).hex())
+        seb_file = EXAMS[exam_id].get('seb_file', f'{exam_id}.seb')
+        if regenerate_seb:
+            try:
+                (seb_data, config_key) = generate_seb_file(exam_id, exam_password, quit_password, ua)
+                
+                # Save SEB file to disk
+                seb_dir = os.path.join(os.path.dirname(__file__), 'seb_files')
+                os.makedirs(seb_dir, exist_ok=True)
+                seb_path = os.path.join(seb_dir, seb_file)
+                
+                with open(seb_path, 'wb') as f:
+                    f.write(seb_data)
+                    
+                flash('SEB config file regenerated successfully!', 'success')
+            except Exception as e:
+                flash(f'Failed to regenerate SEB file: {str(e)}', 'error')
+        
         EXAMS[exam_id] = {
             'exam_key': EXAMS[exam_id]['exam_key'],
             'user_id': EXAMS[exam_id].get('user_id'),
             'custom_name': custom_name,
             'beks': beks,
-            'ck': ck,
+            'ck': config_key if regenerate_seb else EXAMS[exam_id].get('ck', ''),
             'ua': ua,
-            'tools': tools
+            'tools': tools,
+            'seb_file': seb_file
         }
         
         save_exams(EXAMS)
@@ -232,6 +304,33 @@ def edit_exam(exam_id):
         return redirect(url_for('routes.index'))
     
     return render_template('edit.html', exam_id=exam_id, exam=EXAMS[exam_id], exam_apps=EXAM_APPS)
+
+@routes_bp.route('/exam/<exam_id>/download')
+@login_required
+def download_seb(exam_id):
+    """Download the SEB config file for an exam"""
+    if exam_id not in EXAMS:
+        flash(f'Exam "{exam_id}" not found', 'error')
+        return redirect(url_for('routes.index'))
+    
+    # Check permissions
+    if session.get('role') != 'admin' and EXAMS[exam_id].get('user_id') != session.get('user_id'):
+        flash('You do not have permission to download this SEB file', 'error')
+        return redirect(url_for('routes.index'))
+    
+    exam = EXAMS[exam_id]
+    seb_file = exam.get('seb_file', f'{exam_id}.seb')
+    seb_path = os.path.join(os.path.dirname(__file__), 'seb_files', seb_file)
+    
+    if not os.path.exists(seb_path):
+        flash('SEB file not found. Please regenerate it by editing the exam.', 'error')
+        return redirect(url_for('routes.exam_details', exam_id=exam_id))
+    
+    # Use custom name or exam key as filename
+    download_name = exam.get('custom_name', exam.get('exam_key', exam_id))
+    download_name = download_name.replace(' ', '_') + '.seb'
+    
+    return send_file(seb_path, as_attachment=True, download_name=download_name)
 
 @routes_bp.route('/delete/<exam_id>', methods=['POST'])
 @login_required

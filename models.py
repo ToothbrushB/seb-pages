@@ -1,10 +1,10 @@
 import json, os, uuid
 from datetime import datetime
 
-EXAM_DB_PATH = 'exams.json'
-EXAM_APPS_PATH = 'exam_apps.json'
-USERS_DB_PATH = 'users.json'
-EXAM_ATTEMPTS_PATH = 'exam_attempts.json'
+EXAM_DB_PATH = 'data/exams.json'
+EXAM_APPS_PATH = 'data/exam_apps.json'
+USERS_DB_PATH = 'data/users.json'
+EXAM_ATTEMPTS_PATH = 'data/exam_attempts.json'
 
 def load_exams():
     if os.path.exists(EXAM_DB_PATH):

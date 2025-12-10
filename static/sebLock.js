@@ -64,7 +64,7 @@ function didUpdateSEBSecurityInfo() {
             document.getElementById("seb-check").classList.remove("alert-success");
             document.getElementById("seb-check").classList.add("alert-danger", "bad");
             sebOk = false;
-        } else if (!hashedBEKs.includes(bekActual)) {
+        } else if (!hashedBEKs.includes(bekActual) && bekExpectedArray.length > 0) {
             // Check if the actual BEK matches ANY of the expected BEKs
             document.getElementById("seb-check").innerHTML = "Security check failed: Browser Exam Key does not match any expected values.";
             document.getElementById("seb-check").classList.remove("alert-success");
