@@ -160,9 +160,6 @@ def generate_config_key(plist_data):
     # Convert to SEB-JSON format
     seb_json = _to_seb_json_recursive(config_dict)
     
-    with open("debug_seb.json", 'w', encoding='utf-8') as f:
-        f.write(seb_json)
-    
     # Generate SHA256 hash
     hash_bytes = hashlib.sha256(seb_json.encode('utf-8')).digest()
     
